@@ -1,0 +1,6 @@
+web:
+   upload-path: ../temp/converter/upload/ppts/
+   
+pptx:
+   image-path: ../temp/converter/upload/images/
+   

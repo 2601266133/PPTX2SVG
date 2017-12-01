@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cisco.pptx_to_jpg_converter.mapper.PPTInfoMapper" >
+
+<resultMap id="pptMap" type="com.cisco.pptx_to_jpg_converter.model.PPTInformation">
+  <id property="id" column="ID" />
+  <result property="filePath" column="FILE_PATH" />
+  <result property="fileNewName" column="FILE_NEW_NAME" />
+  <result property="fileOrignName" column="FILE_ORIGN_NAME" />
+  <result property="imagePath" column="IMAGE_PATH" />
+  <result property="imageUUID" column="IMAGE_UUID" /> 
+  <result property="createdDate" column="CREATED_DT" />
+  <result property="createdBy" column="CREATED_BY" />
+   <collection property="imageInfoList" ofType="com.cisco.pptx_to_jpg_converter.model.ImageInformation">
+  <id property="id" column="I_ID"/>   
+  <result property="pptId" column="I_PPT_ID"/> 
+  <result property="imagePath" column="I_IMAGE_PATH"/>
+  <result property="imageName" column="I_IMAGE_NAME"/>
+  <result property="createdDate" column="I_CREATED_DT"/>
+  <result property="createdBy" column="I_CREATED_BY"/>
+  </collection> 
+  <!-- <collection property="imageInfoList" column="ID" select="com.cisco.pptx_to_jpg_converter.mapper.PPTInfoMapper.getImagesByPPTId" ofType="com.cisco.pptx_to_jpg_converter.model.PPTInformation"/> -->
+</resultMap>
+
+<resultMap id="imageMap" type="com.cisco.pptx_to_jpg_converter.model.ImageInformation">
+  <id property="id" column="ID"/>   
+  <result property="pptId" column="PPT_ID"/> 
+  <result property="imagePath" column="IMAGE_PATH"/>
+  <result property="imageName" column="IMAGE_NAME"/>
+  <result property="createdDate" column="CREATED_DT"/>
+  <result property="createdBy" column="CREATED_BY"/>
+</resultMap>
+
+<select id="getPPTs" resultMap="pptMap">
+               select P.ID,
+               P.FILE_PATH,
+               P.FILE_NEW_NAME,
+               P.FILE_ORIGN_NAME,
+               P.IMAGE_PATH,
+               P.IMAGE_UUID,
+               P.CREATED_DT,
+               P.CREATED_BY,
+               I.ID as I_ID, 
+               I.PPT_ID as I_PPT_ID,
+               I.IMAGE_PATH as I_IMAGE_PATH,
+               I.IMAGE_NAME as I_IMAGE_NAME,               
+               I.CREATED_DT as I_CREATED_DT,
+               I.CREATED_BY as I_CREATED_BY
+ from pptinfo P left join imageinfo I on P.ID = I.PPT_ID order by P.ID,I.PPT_ID,I.ID asc;
+</select>
+
+<select id="getPPTById" parameterType="String" resultMap="pptMap">
+  select P.ID,
+               P.FILE_PATH,
+               P.FILE_NEW_NAME,
+               P.FILE_ORIGN_NAME,
+               P.IMAGE_PATH,
+               P.IMAGE_UUID,
+               P.CREATED_DT,
+               P.CREATED_BY,
+               I.ID as I_ID, 
+               I.PPT_ID as I_PPT_ID,
+               I.IMAGE_PATH as I_IMAGE_PATH,
+               I.IMAGE_NAME as I_IMAGE_NAME,               
+               I.CREATED_DT as I_CREATED_DT,
+               I.CREATED_BY as I_CREATED_BY
+ from pptinfo P left join imageinfo I on P.ID = I.PPT_ID where P.ID=#{id} order by P.ID,I.PPT_ID,I.ID asc;
+</select>
+
+<select id="getPPTByName" parameterType="String" resultMap="pptMap">
+select P.ID,
+               P.FILE_PATH,
+               P.FILE_NEW_NAME,
+               P.FILE_ORIGN_NAME,
+               P.IMAGE_PATH,
+               P.IMAGE_UUID,
+               P.CREATED_DT,
+               P.CREATED_BY,
+               I.ID as I_ID, 
+               I.PPT_ID as I_PPT_ID,
+               I.IMAGE_PATH as I_IMAGE_PATH,
+               I.IMAGE_NAME as I_IMAGE_NAME,               
+               I.CREATED_DT as I_CREATED_DT,
+               I.CREATED_BY as I_CREATED_BY
+ from pptinfo P left join imageinfo I on P.ID = I.PPT_ID where P.FILE_NEW_NAME in (#{fileName} +'.pptx',#{fileName} +'.ppt')order by P.ID,I.PPT_ID,I.ID asc;
+</select>
+
+<insert id="addPPT" parameterType="com.cisco.pptx_to_jpg_converter.model.PPTInformation">
+ set @pptId := nextval('se_pptinfo_id');
+ insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
+               values(@pptId,#{filePath},#{fileNewName},#{fileOrignName},#{imagePath},#{imageUUID},current_timestamp,#{createdBy});              
+</insert>
+
+<delete id="deletePPT" parameterType="String">
+ delete from imageinfo where PPT_ID = #{id};
+ delete from pptinfo where id = #{id};
+</delete>
+
+<delete id="deletePPTs">
+delete from imageinfo;
+ delete from pptinfo;
+</delete>
+
+<insert id="addPPTByMap" parameterType="Map">
+ <!-- set @pptId := nextval('se_pptinfo_id'); -->
+ <selectKey keyProperty="pptInfo.id" resultType="String" order="BEFORE">
+ select nextval('se_pptinfo_id') from dual;
+ </selectKey>
+ insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
+               values(#{pptInfo.id},#{pptInfo.filePath},#{pptInfo.fileNewName},#{pptInfo.fileOrignName},#{pptInfo.imagePath},#{pptInfo.imageUUID},current_timestamp,#{pptInfo.createdBy});                 
+ insert into imageinfo(ID,PPT_ID,IMAGE_PATH,IMAGE_NAME,CREATED_DT,CREATED_BY)
+     values<foreach collection="imagesInfoList" item="imageInfo" separator=",">
+    (nextval('se_imageinfo_id'),#{pptInfo.id},#{imageInfo.imagePath},#{imageInfo.imageName},current_timestamp,#{imageInfo.createdBy})
+    </foreach>                
+</insert>
+
+<select id="getImagesByPPTId" parameterType="String" resultMap="imageMap">
+select * from imageinfo where PPT_ID=#{pptId}
+</select>
+
+<select id="getImageById"  parameterType="String" resultMap="imageMap">
+select * from imageinfo where id=#{id} 
+</select>
+
+
+</mapper>

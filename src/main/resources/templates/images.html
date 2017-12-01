@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Hello World!</title>
+</head>
+<body>
+
+<p>Images to show</p>
+ <div th:text="${PPTid}"></div>
+   <ol>
+   <li>
+   
+   <span th:each="names : ${map.imgNames}" >
+    <span th:text="${map.path} + ${names}"></span>
+    <img th:src="@{'/images/' + ${map.uuID}+'//' +${names}}" heigth="250px" width="280px"/>
+   </span>
+   </li>
+   </ol>
+   
+</body>
+</html>
