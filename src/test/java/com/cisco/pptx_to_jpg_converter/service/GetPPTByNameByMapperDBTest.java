@@ -33,8 +33,8 @@ public class GetPPTByNameByMapperDBTest {
 	public void setUp() throws Exception {
 		String sql01 = "delete from imageInfo where id in(-1,-2);";
 		String sql0 = "delete from pptinfo where id in (-1,-2)";
-		String sql1 = "insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY) values(-1,'D:/junit/ppt/','117junit.pptx','junit.pptx','D:/junit/images/118/','118',current_timestamp,'junit');";
-		String sql2 = "insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY) values(-2,'D:/junit/ppt/','1171junit.pptx','junit.pptx','D:/junit/images/1181/','1181',current_timestamp,'junit');";
+		String sql1 = "insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,FILE_SIZE,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY) values(-1,'D:/junit/ppt/','117junit.pptx','junit.pptx','2MB','D:/junit/images/118/','118',current_timestamp,'junit');";
+		String sql2 = "insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,FILE_SIZE,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY) values(-2,'D:/junit/ppt/','1171junit.pptx','junit.pptx','2MB','D:/junit/images/1181/','1181',current_timestamp,'junit');";
 		String sql3 = "insert into imageinfo(ID,PPT_ID,IMAGE_PATH,IMAGE_NAME,CREATED_DT,CREATED_BY) values(-1,-1,'D:/junit/images/118/','001.jpg',current_timestamp,'junit')";
 		String sql4 = "insert into imageinfo(ID,PPT_ID,IMAGE_PATH,IMAGE_NAME,CREATED_DT,CREATED_BY) values(-2,-2,'D:/junit/images/1181/','990.jpg',current_timestamp,'junit')";
 		List<String> sqls = new ArrayList<String>();

@@ -3,6 +3,7 @@ package com.cisco.pptx_to_jpg_converter.util.converter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,4 +73,18 @@ public abstract class AbstractConverter implements Converter {
 		return resultsMap;
 	}
 
+	public static String FormetFileSize(long fileS) {// 转换文件大小
+		DecimalFormat df = new DecimalFormat("#.000");
+		String fileSizeString = "";
+		if (fileS < 1024) {
+			fileSizeString = df.format((double) fileS) + "B";
+		} else if (fileS < 1048576) {
+			fileSizeString = df.format((double) fileS / 1024) + "KB";
+		} else if (fileS < 1073741824) {
+			fileSizeString = df.format((double) fileS / 1048576) + "MB";
+		} else {
+			fileSizeString = df.format((double) fileS / 1073741824) + "GB";
+		}
+		return fileSizeString;
+	}
 }

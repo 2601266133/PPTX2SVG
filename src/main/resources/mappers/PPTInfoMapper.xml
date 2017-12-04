@@ -9,6 +9,7 @@
   <result property="fileOrignName" column="FILE_ORIGN_NAME" />
   <result property="imagePath" column="IMAGE_PATH" />
   <result property="imageUUID" column="IMAGE_UUID" /> 
+  <result property="size" column="FILE_SIZE"/>
   <result property="createdDate" column="CREATED_DT" />
   <result property="createdBy" column="CREATED_BY" />
    <collection property="imageInfoList" ofType="com.cisco.pptx_to_jpg_converter.model.ImageInformation">
@@ -36,6 +37,7 @@
                P.FILE_PATH,
                P.FILE_NEW_NAME,
                P.FILE_ORIGN_NAME,
+               P.FILE_SIZE,
                P.IMAGE_PATH,
                P.IMAGE_UUID,
                P.CREATED_DT,
@@ -54,6 +56,7 @@
                P.FILE_PATH,
                P.FILE_NEW_NAME,
                P.FILE_ORIGN_NAME,
+               P.FILE_SIZE,
                P.IMAGE_PATH,
                P.IMAGE_UUID,
                P.CREATED_DT,
@@ -72,6 +75,7 @@ select P.ID,
                P.FILE_PATH,
                P.FILE_NEW_NAME,
                P.FILE_ORIGN_NAME,
+               P.FILE_SIZE,
                P.IMAGE_PATH,
                P.IMAGE_UUID,
                P.CREATED_DT,
@@ -87,8 +91,8 @@ select P.ID,
 
 <insert id="addPPT" parameterType="com.cisco.pptx_to_jpg_converter.model.PPTInformation">
  set @pptId := nextval('se_pptinfo_id');
- insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
-               values(@pptId,#{filePath},#{fileNewName},#{fileOrignName},#{imagePath},#{imageUUID},current_timestamp,#{createdBy});              
+ insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,FILE_SIZE,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
+               values(@pptId,#{filePath},#{fileNewName},#{fileOrignName},#{size},#{imagePath},#{imageUUID},current_timestamp,#{createdBy});              
 </insert>
 
 <delete id="deletePPT" parameterType="String">
@@ -106,8 +110,8 @@ delete from imageinfo;
  <selectKey keyProperty="pptInfo.id" resultType="String" order="BEFORE">
  select nextval('se_pptinfo_id') from dual;
  </selectKey>
- insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
-               values(#{pptInfo.id},#{pptInfo.filePath},#{pptInfo.fileNewName},#{pptInfo.fileOrignName},#{pptInfo.imagePath},#{pptInfo.imageUUID},current_timestamp,#{pptInfo.createdBy});                 
+ insert into pptinfo(ID,FILE_PATH,FILE_NEW_NAME,FILE_ORIGN_NAME,FILE_SIZE,IMAGE_PATH,IMAGE_UUID,CREATED_DT,CREATED_BY)
+               values(#{pptInfo.id},#{pptInfo.filePath},#{pptInfo.fileNewName},#{pptInfo.fileOrignName},#{pptInfo.size},#{pptInfo.imagePath},#{pptInfo.imageUUID},current_timestamp,#{pptInfo.createdBy});                 
  insert into imageinfo(ID,PPT_ID,IMAGE_PATH,IMAGE_NAME,CREATED_DT,CREATED_BY)
      values<foreach collection="imagesInfoList" item="imageInfo" separator=",">
     (nextval('se_imageinfo_id'),#{pptInfo.id},#{imageInfo.imagePath},#{imageInfo.imageName},current_timestamp,#{imageInfo.createdBy})

@@ -117,6 +117,7 @@ public class PPTFileUploadController {
 					pptInfo.setFilePath(filePath);
 					pptInfo.setFileNewName(newName);
 					pptInfo.setFileOrignName(name);
+					pptInfo.setSize(AbstractConverter.FormetFileSize(file.getSize()));
 					pptInfo.setImagePath(map.get("path").toString());
 					pptInfo.setImageUUID(map.get("uuID").toString());
 					pptInfo.setCreatedBy("jacsong2");

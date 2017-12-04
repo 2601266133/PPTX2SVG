@@ -37,6 +37,7 @@ public class AddPPTByMapByMapperDBTest {
 		pptInfo.setFileOrignName("junit.pptx");
 		pptInfo.setImagePath("D:/junit/images/118/");
 		pptInfo.setImageUUID("118");
+		pptInfo.setSize("1MB");
 		pptInfo.setCreatedBy("junit");
 		List<ImageInformation> imagesInforList = new ArrayList<ImageInformation>();
 		ImageInformation image = new ImageInformation();

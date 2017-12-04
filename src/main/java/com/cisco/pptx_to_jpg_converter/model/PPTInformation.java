@@ -10,9 +10,18 @@ public class PPTInformation {
 	String fileOrignName;
 	String imagePath;
 	String imageUUID;
+	String size;
 	Date createdDate;
 	String createdBy;
 	List<ImageInformation> imageInfoList;
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
 
 	public List<ImageInformation> getImageInfoList() {
 		return imageInfoList;
