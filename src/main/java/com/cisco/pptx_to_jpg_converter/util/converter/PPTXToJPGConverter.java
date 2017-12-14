@@ -57,7 +57,7 @@ public class PPTXToJPGConverter extends AbstractConverter {
 			// 获取PPT文件中的所有PPT页面，并转换为一张张播放片
 			List<XSLFSlide> pptPageXSLFSLiseList = oneSlideShow.getSlides();
 
-			String xmlFontFormat = "<xml-fragment xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">"
+			String xmlFontFormat = "<xml-fragment xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">"
 					+ "<a:rPr lang=\"zh-CN\" altLang=\"en-US\" dirty=\"0\" smtClean=\"0\"> "
 					+ "<a:latin typeface=\"+mj-ea\"/> " + "</a:rPr>" + "</xml-fragment>";
 			uuID = UUID.randomUUID().toString();
@@ -118,12 +118,14 @@ public class PPTXToJPGConverter extends AbstractConverter {
 
 				BufferedImage oneBufferedImage = new BufferedImage(onePPTPageSize.width, onePPTPageSize.height,
 						BufferedImage.TYPE_INT_RGB);
+				oneBufferedImage = getScaledImage(oneBufferedImage, onePPTPageSize.width, onePPTPageSize.height);
 				Graphics2D oneGraphics2D = oneBufferedImage.createGraphics();
 				/**
 				 * 设置转换后的图片背景色为白色
-				 * 
+				 *
 				 */
 				oneGraphics2D.setPaint(Color.white);
+				oneGraphics2D.setBackground(pptPageXSLFSLiseList.get(i).getBackground().getFillColor());
 				oneGraphics2D.fill(new Rectangle2D.Float(0, 0, onePPTPageSize.width, onePPTPageSize.height));
 				// 将PPT文件中的每个页面中的相关内容画到转换后的图片中
 				pptPageXSLFSLiseList.get(i).draw(oneGraphics2D);
@@ -184,6 +186,7 @@ public class PPTXToJPGConverter extends AbstractConverter {
 
 	@Override
 	public void writeImages() throws IOException {
+
 		for (Map<String, BufferedImage> imageInfo : convertedImagesInfoList) {
 			for (Entry<String, BufferedImage> image : imageInfo.entrySet()) {
 				// 将转换后的各个图片文件保存带指定的目录中

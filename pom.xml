@@ -45,9 +45,13 @@
           <scope>provided</scope>
         </dependency>
         
-
-
-		<!-- thmleaf模板依赖. -->
+<!-- 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+ -->
+       <!-- thmleaf模板依赖. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -90,6 +94,50 @@
 			<artifactId>xmlbeans</artifactId>
 			<version>2.6.0</version>
 		</dependency>
+		
+<!-- https://mvnrepository.com/artifact/org.w3c.dom/org.w3c.dom.svg -->
+<dependency>
+    <groupId>org.w3c.dom</groupId>
+    <artifactId>org.w3c.dom.svg</artifactId>
+    <version>1.1.0.v201011041433</version>
+</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-svggen -->
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-svggen</artifactId>
+    <version>1.9.1</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>org.apache.xmlgraphics</groupId>
+    <artifactId>batik-codec</artifactId>
+    <version>1.9.1</version>
+</dependency>
+
+
+        <!--docx4j  -->
+        <dependency>
+			<groupId>org.docx4j</groupId>
+			<artifactId>docx4j</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		 <dependency>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-api</artifactId>
+           <version>1.7.5</version>
+        </dependency>
+		<dependency>
+			<groupId>org.docx4j</groupId>
+			<artifactId>docx4j-MOXy-JAXBContext</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.moxy</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+		
 
         <!-- MYSQL -->
         <dependency>

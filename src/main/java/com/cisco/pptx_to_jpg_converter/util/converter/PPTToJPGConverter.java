@@ -89,6 +89,7 @@ public class PPTToJPGConverter extends AbstractConverter {
 
 				BufferedImage oneBufferedImage = new BufferedImage(onePPTPageSize.width, onePPTPageSize.height,
 						BufferedImage.TYPE_INT_RGB);
+				oneBufferedImage = getScaledImage(oneBufferedImage, 100, 200);
 				Graphics2D oneGraphics2D = oneBufferedImage.createGraphics();
 				/**
 				 * 设置转换后的图片背景色为白色

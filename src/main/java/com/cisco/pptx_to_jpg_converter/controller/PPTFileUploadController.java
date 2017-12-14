@@ -38,8 +38,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cisco.pptx_to_jpg_converter.model.PPTInformation;
 import com.cisco.pptx_to_jpg_converter.service.CiscoService;
 import com.cisco.pptx_to_jpg_converter.util.converter.AbstractConverter;
-import com.cisco.pptx_to_jpg_converter.util.converter.PPTToJPGConverter;
-import com.cisco.pptx_to_jpg_converter.util.converter.PPTXToJPGConverter;
+import com.cisco.pptx_to_jpg_converter.util.converter.PPTToSVGConverter;
+import com.cisco.pptx_to_jpg_converter.util.converter.PPTXToSVGConverter;
 
 @RestController
 public class PPTFileUploadController {
@@ -51,6 +51,9 @@ public class PPTFileUploadController {
 
 	@Value("${pptx.image-path}")
 	private String pptxImagePath;
+
+	@Value("${temp.convert-ppt-path}")
+	private String pptxToPPTPath;
 
 	@Autowired
 	private CiscoService service;
@@ -89,6 +92,7 @@ public class PPTFileUploadController {
 			Map<String, Object> map = new HashMap<String, Object>();
 			AbstractConverter converter = null;
 			PPTInformation pptInfo = null;
+			File tempPPTFile = null;
 			try {
 				// 获取文件名
 				fileName = file.getOriginalFilename();
@@ -106,9 +110,9 @@ public class PPTFileUploadController {
 				File dest = new File(filePath + newName);
 
 				if (".pptx".equals(suffixName) || ".potx".equals(suffixName) || ".ppsx".equals(suffixName)) {
-					converter = new PPTXToJPGConverter(file.getInputStream(), pptxImagePath, "jpg");
+					converter = new PPTXToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
 				} else if (".ppt".equals(suffixName) || ".pps".equals(suffixName)) {
-					converter = new PPTToJPGConverter(file.getInputStream(), pptxImagePath, "jpg");
+					converter = new PPTToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
 				}
 				if (converter != null) {
 					converter.convert();
@@ -130,7 +134,6 @@ public class PPTFileUploadController {
 					logger.info("The PPT ID is: " + pptInfo.getId());
 
 					converter.writeImages();
-
 				}
 
 				// 检测是否存在目录
