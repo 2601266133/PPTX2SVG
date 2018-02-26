@@ -37,9 +37,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.cisco.pptx_to_jpg_converter.model.PPTInformation;
 import com.cisco.pptx_to_jpg_converter.service.CiscoService;
-import com.cisco.pptx_to_jpg_converter.util.converter.AbstractConverter;
-import com.cisco.pptx_to_jpg_converter.util.converter.PPTToSVGConverter;
-import com.cisco.pptx_to_jpg_converter.util.converter.PPTXToSVGConverter;
+import com.cisco.pptx_to_jpg_converter.util.AbstractConverter;
+import com.cisco.pptx_to_jpg_converter.util.PPTToSVGConverter;
+import com.cisco.pptx_to_jpg_converter.util.PPTXToSVGConverter;
 
 @RestController
 public class PPTFileUploadController {
@@ -166,7 +166,12 @@ public class PPTFileUploadController {
 				e.printStackTrace();
 				logger.error(e.getMessage());
 				PPTInfoController controller = new PPTInfoController();
-				controller.deletePPTByid(pptInfo.getId());
+				controller.deletePPTAndImages(pptInfo);
+				service.deletePPTByIdByMapper(pptInfo.getId());
+				return pptInfo;
+			} catch (Exception ee) {
+				ee.printStackTrace();
+				logger.error(ee.getMessage());
 				return pptInfo;
 			}
 

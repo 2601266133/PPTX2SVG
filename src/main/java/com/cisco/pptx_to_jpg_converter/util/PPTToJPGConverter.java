@@ -1,4 +1,4 @@
-package com.cisco.pptx_to_jpg_converter.util.converter;
+package com.cisco.pptx_to_jpg_converter.util;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,122 +17,89 @@ import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFChart;
-import org.apache.poi.xslf.usermodel.XSLFPictureData;
-import org.apache.poi.xslf.usermodel.XSLFShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.apache.poi.hslf.usermodel.HSLFSlide;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
+import org.apache.poi.hslf.usermodel.HSLFTextParagraph;
+import org.apache.poi.hslf.usermodel.HSLFTextRun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cisco.pptx_to_jpg_converter.model.ImageInformation;
 
-public class PPTXToJPGConverter extends AbstractConverter {
+public class PPTToJPGConverter extends AbstractConverter {
 
-	private static final Logger logger = LoggerFactory.getLogger(PPTXToJPGConverter.class);
+	private static final Logger logger = LoggerFactory.getLogger(PPTToJPGConverter.class);
 
-	public PPTXToJPGConverter(InputStream inStream, String targetImageFileDir, String imageFormatNameString) {
+	public PPTToJPGConverter(InputStream inStream, String targetImageFileDir, String imageFormatNameString) {
 		super(inStream, targetImageFileDir, imageFormatNameString);
 	}
 
 	@Override
-	public void convert() throws Exception {
+	public void convert() {
 		converReturnResult = true;// 是否全部转成功
 		List<String> imgNamesList = new ArrayList<String>();// PPT转成图片后所有名称集合
 		List<File> imagesFileList = new ArrayList<File>();// 所有图片的file
 		List<ImageInformation> imagesInfoList = new ArrayList<ImageInformation>();
-		XMLSlideShow oneSlideShow = null;
+		HSLFSlideShow oneHSLFSlideShow = null;
 		File dest = null;
 		String uuID = null;
 		try {
 
-			oneSlideShow = new XMLSlideShow(inStream);
+			oneHSLFSlideShow = new HSLFSlideShow(inStream);
 
 			// 获取PPT每页的尺寸大小（宽和高度）
-			Dimension onePPTPageSize = oneSlideShow.getPageSize();
+			Dimension onePPTPageSize = oneHSLFSlideShow.getPageSize();
 			// 获取PPT文件中的所有PPT页面，并转换为一张张播放片
-			List<XSLFSlide> pptPageXSLFSLiseList = oneSlideShow.getSlides();
+			List<HSLFSlide> pptPageSlideList = oneHSLFSlideShow.getSlides();
 
-			String xmlFontFormat = "<xml-fragment xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">"
+			String xmlFontFormat = "<xml-fragment xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:p=\"http://schemas.openxmlformats.org/presentationml/2006/main\">"
 					+ "<a:rPr lang=\"zh-CN\" altLang=\"en-US\" dirty=\"0\" smtClean=\"0\"> "
 					+ "<a:latin typeface=\"+mj-ea\"/> " + "</a:rPr>" + "</xml-fragment>";
 			uuID = UUID.randomUUID().toString();
 			logger.info("parent image direct: " + targetImageFileDir);
 			targetImageFileDir = targetImageFileDir + uuID + File.separator;
 			logger.info("real image direct: " + targetImageFileDir);
-			for (int i = 0; i < pptPageXSLFSLiseList.size(); i++) {
-				/**
-				 * 设置中文为宋体，解决中文乱码问题
-				 */
-				// CTSlide oneCTSlide = pptPageXSLFSLiseList.get(i).getXmlObject();
-				// CTGroupShape oneCTGroupShape = oneCTSlide.getCSld().getSpTree();
-				// List<CTShape> oneCTShapeList = oneCTGroupShape.getSpList();
-				// for (CTShape ctShape : oneCTShapeList) {
-				// CTTextBody oneCTTextBody = ctShape.getTxBody();
-				//
-				// if (null == oneCTTextBody) {
-				// continue;
-				// }
-				// CTTextParagraph[] oneCTTextParagraph = oneCTTextBody.getPArray();
-				// CTTextFont oneCTTextFont = null;
-				// oneCTTextFont = CTTextFont.Factory.parse(xmlFontFormat);
-				// for (CTTextParagraph ctTextParagraph : oneCTTextParagraph) {
-				// CTRegularTextRun[] onrCTRegularTextRunArray = ctTextParagraph.getRArray();
-				// for (CTRegularTextRun ctRegularTextRun : onrCTRegularTextRunArray) {
-				// CTTextCharacterProperties oneCTTextCharacterProperties =
-				// ctRegularTextRun.getRPr();
-				// oneCTTextCharacterProperties.setLatin(oneCTTextFont);
-				//
-				// }
-				//
-				// }
-				// }
+			for (int i = 0; i < pptPageSlideList.size(); i++) {
+				// 这几个循环只要是设置字体为宋体，防止中文乱码，
+				List<List<HSLFTextParagraph>> oneTextParagraphs = pptPageSlideList.get(i).getTextParagraphs();
+				for (List<HSLFTextParagraph> list : oneTextParagraphs) {
+					for (HSLFTextParagraph hslfTextParagraph : list) {
+						List<HSLFTextRun> HSLFTextRunList = hslfTextParagraph.getTextRuns();
+						for (int j = 0; j < HSLFTextRunList.size(); j++) {
 
-				for (XSLFShape shape : pptPageXSLFSLiseList.get(i).getShapes()) {
-					if (shape instanceof XSLFTextShape) {
-						XSLFTextShape tsh = (XSLFTextShape) shape;
-						for (XSLFTextParagraph p : tsh) {
-							for (XSLFTextRun r : p) {
-								r.setFontFamily("宋体");
+							/*
+							 * 如果PPT在WPS中保存过，则 HSLFTextRunList.get(j).getFontSize();的值为0或者26040，
+							 * 因此首先识别当前文本框内的字体尺寸是否为0或者大于26040，则设置默认的字体尺寸。
+							 * 
+							 */
+							// 设置字体大小
+							Double size = HSLFTextRunList.get(j).getFontSize();
+							if ((size <= 0) || (size >= 26040)) {
+								HSLFTextRunList.get(j).setFontSize(20.0);
 							}
+							// 设置字体样式为宋体
+							// String family=HSLFTextRunList.get(j).getFontFamily();
+							HSLFTextRunList.get(j).setFontFamily("宋体");
 
 						}
 					}
-				}
-
-				XSLFSlide tempSlide = null;
-				XSLFPictureData picture = null;
-				for (POIXMLDocumentPart part : pptPageXSLFSLiseList.get(i).getRelations()) {
-					if (part instanceof XSLFChart) {
-						XSLFChart chart = (XSLFChart) part;
-						// logger.info(chart.getCTChart().getPlotArea().toString());
-					}
-
 				}
 
 				// 创建BufferedImage 对象，图像尺寸为原来的PPT的每页尺寸
 
 				BufferedImage oneBufferedImage = new BufferedImage(onePPTPageSize.width, onePPTPageSize.height,
 						BufferedImage.TYPE_INT_RGB);
-				oneBufferedImage = getScaledImage(oneBufferedImage, onePPTPageSize.width, onePPTPageSize.height);
+				oneBufferedImage = getScaledImage(oneBufferedImage, 100, 200);
 				Graphics2D oneGraphics2D = oneBufferedImage.createGraphics();
 				/**
 				 * 设置转换后的图片背景色为白色
-				 *
+				 * 
 				 */
 				oneGraphics2D.setPaint(Color.white);
-				oneGraphics2D.setBackground(pptPageXSLFSLiseList.get(i).getBackground().getFillColor());
 				oneGraphics2D.fill(new Rectangle2D.Float(0, 0, onePPTPageSize.width, onePPTPageSize.height));
-				// 将PPT文件中的每个页面中的相关内容画到转换后的图片中
-				pptPageXSLFSLiseList.get(i).draw(oneGraphics2D);
 
-				// DrawFactory drawFact = DrawFactory.getInstance(oneGraphics2D);
-				// Drawable draw = drawFact.getDrawable(pptPageXSLFSLiseList.get(i));
-				// draw.draw(oneGraphics2D);
+				// 将PPT文件中的每个页面中的相关内容画到转换后的图片中
+				pptPageSlideList.get(i).draw(oneGraphics2D);
 				/**
 				 * 设置图片的存放路径和图片格式，注意生成的文件路径为绝对路径，最终获得各个图像文件所对应的输出流的对象
 				 */
@@ -154,17 +121,11 @@ public class PPTXToJPGConverter extends AbstractConverter {
 				Map<String, BufferedImage> imageMap = new HashMap<String, BufferedImage>();
 				imageMap.put(targetImageFileDir + imgName, oneBufferedImage);
 				convertedImagesInfoList.add(imageMap);
-
 				// 将转换后的各个图片文件保存带指定的目录中
 				// ImageIO.write(oneBufferedImage, imageFormatNameString, dest);
 
 			}
-		}
-		// catch (XmlException e) {
-		// e.printStackTrace();
-		// converReturnResult = false;
-		// }
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			converReturnResult = false;
 		} finally {
@@ -186,7 +147,6 @@ public class PPTXToJPGConverter extends AbstractConverter {
 
 	@Override
 	public void writeImages() throws IOException {
-
 		for (Map<String, BufferedImage> imageInfo : convertedImagesInfoList) {
 			for (Entry<String, BufferedImage> image : imageInfo.entrySet()) {
 				// 将转换后的各个图片文件保存带指定的目录中
@@ -195,5 +155,4 @@ public class PPTXToJPGConverter extends AbstractConverter {
 		}
 
 	}
-
 }

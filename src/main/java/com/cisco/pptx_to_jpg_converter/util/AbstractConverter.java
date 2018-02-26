@@ -1,4 +1,4 @@
-package com.cisco.pptx_to_jpg_converter.util.converter;
+package com.cisco.pptx_to_jpg_converter.util;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;

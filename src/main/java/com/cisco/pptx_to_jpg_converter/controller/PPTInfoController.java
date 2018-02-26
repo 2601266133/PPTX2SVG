@@ -78,7 +78,7 @@ public class PPTInfoController {
 		return new RequestResult("Success", "成功。", "204");
 	}
 
-	private void deletePPTAndImages(PPTInformation result) {
+	public void deletePPTAndImages(PPTInformation result) {
 		String filePath = result.getFilePath();
 		String fileNewName = result.getFileNewName();
 		String imagePath = result.getImagePath();
