@@ -1,5 +1,20 @@
 package com.cisco.pptx_to_jpg_converter.xslfchart.attribute;
 
+/**
+ * 
+ * 5.1.5.1.1 bodyPr (Body Properties)
+ * 
+ * child elements: extLst (Extension List) §5.1.2.1.15 flatTx (No text in 3D
+ * scene) §5.1.7.8 noAutofit (No AutoFit) §5.1.5.1.2 normAutofit (Normal
+ * AutoFit) §5.1.5.1.3 prstTxWarp (Preset Text Warp) §5.1.11.19 scene3d (3D
+ * Scene Properties) §5.1.4.1.26 sp3d (Apply 3D shape properties) §5.1.7.12
+ * spAutoFit (Shape AutoFit) §5.1.5.1.4
+ * 
+ * attributes:
+ * 
+ *
+ */
+
 public class BodyProperties {
 	boolean anchorCtr;
 	String anchor;

@@ -1,97 +1,36 @@
 package com.cisco.pptx_to_jpg_converter.xslfchart.attribute;
 
+import java.util.List;
+
+/**
+ * 
+ * 5.1.5.2.6 p (Text Paragraphs)
+ * 
+ * child elements: br (Text Line Break) §5.1.5.2.1 endParaRPr (End Paragraph Run
+ * Properties) §5.1.5.2.3 fld (Text Field) §5.1.5.2.4 pPr (Text Paragraph
+ * Properties) §5.1.5.2.7 r (Text Run) §5.1.5.3.8
+ *
+ */
+
 public class TextParagraphs {
 
-	int baseline;
-	String spc;
-	String kern;
-	String strike;
-	String u;
-	String i;
-	boolean b;
-	String sz;
-	String endParaRPr;
+	TextParagraphProperties pPr;
+	List<TextRun> r;
 
-	String fillType;
-
-	public int getBaseline() {
-		return baseline;
+	public List<TextRun> getR() {
+		return r;
 	}
 
-	public void setBaseline(int baseline) {
-		this.baseline = baseline;
+	public void setR(List<TextRun> r) {
+		this.r = r;
 	}
 
-	public String getSpc() {
-		return spc;
+	public TextParagraphProperties getpPr() {
+		return pPr;
 	}
 
-	public void setSpc(String spc) {
-		this.spc = spc;
-	}
-
-	public String getKern() {
-		return kern;
-	}
-
-	public void setKern(String kern) {
-		this.kern = kern;
-	}
-
-	public String getStrike() {
-		return strike;
-	}
-
-	public void setStrike(String strike) {
-		this.strike = strike;
-	}
-
-	public String getU() {
-		return u;
-	}
-
-	public void setU(String u) {
-		this.u = u;
-	}
-
-	public String getI() {
-		return i;
-	}
-
-	public void setI(String i) {
-		this.i = i;
-	}
-
-	public boolean getB() {
-		return b;
-	}
-
-	public void setB(boolean b) {
-		this.b = b;
-	}
-
-	public String getSz() {
-		return sz;
-	}
-
-	public void setSz(String sz) {
-		this.sz = sz;
-	}
-
-	public String getFillType() {
-		return fillType;
-	}
-
-	public void setFillType(String fillType) {
-		this.fillType = fillType;
-	}
-
-	public String getEndParaRPr() {
-		return endParaRPr;
-	}
-
-	public void setEndParaRPr(String endParaRPr) {
-		this.endParaRPr = endParaRPr;
+	public void setpPr(TextParagraphProperties pPr) {
+		this.pPr = pPr;
 	}
 
 }

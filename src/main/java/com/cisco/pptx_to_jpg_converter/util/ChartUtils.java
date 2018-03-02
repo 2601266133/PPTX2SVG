@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cisco.pptx_to_jpg_converter.model.ChartObj;
+import com.cisco.pptx_to_jpg_converter.xslfchart.ColumnClusteredChart;
 import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DFactory;
 import com.orsoncharts.data.DefaultKeyedValues;
@@ -96,7 +97,6 @@ public class ChartUtils {
 		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getY().toString());
 		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getW().toString());
 		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getH().toString());
-		graphics.drawRect(0, 0, 20, 20);
 
 		// -test
 
@@ -250,6 +250,16 @@ public class ChartUtils {
 			}
 
 		}
+		// test
+		ColumnClusteredChart ccChart = XSLFChartFactory.createColumnClusteredChart(chart, slide);
+		Rectangle2D rtc = new Rectangle2D.Double(rectangle.getX(), rectangle.getY(), rectangle.getWidth(),
+				rectangle.getHeight());
+		graphics.setColor(Color.PINK);
+		graphics.fill(rtc);
+		XSLFChartDraw.drawTitle(ccChart.getTitle(), graphics, ccChart.getXfrm());
+
+		graphics.getSVGElement();
+		// -test
 
 	}
 

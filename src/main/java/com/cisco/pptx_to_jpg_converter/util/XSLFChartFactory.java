@@ -17,6 +17,8 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumVal;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTStrVal;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTTitle;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTTx;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTRegularTextRun;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTShapeProperties;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBodyProperties;
@@ -26,11 +28,20 @@ import com.cisco.pptx_to_jpg_converter.xslfchart.ColumnClusteredChart;
 import com.cisco.pptx_to_jpg_converter.xslfchart.FillType.SolidFill;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.BodyProperties;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.CategoryAxisData;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ChartText;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ComplexScriptFont;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.DefaultTextRunProperties;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.EastAsianFont;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.LatinFont;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ManualLayout;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.RichText;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.Series;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ShapeProperties;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextParagraphProperties;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextParagraphs;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextProperties;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextRun;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextRunProperties;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ValueAxisData;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.XFrame;
 import com.cisco.pptx_to_jpg_converter.xslfchart.color.SchemeColor;
@@ -47,7 +58,7 @@ public class XSLFChartFactory {
 		for (XSLFShape shape : slide.getShapes()) {
 			if (shape instanceof XSLFGraphicFrame) {
 				xfrm.setOffX(shape.getAnchor().getX());
-				xfrm.setOffY(shape.getAnchor().getWidth());
+				xfrm.setOffY(shape.getAnchor().getY());
 				xfrm.setHeight(shape.getAnchor().getHeight());
 				xfrm.setWidth(shape.getAnchor().getWidth());
 			}
@@ -56,16 +67,17 @@ public class XSLFChartFactory {
 
 		Title title = new Title();
 		CTTitle ctTitle = chart.getCTChart().getTitle();
-		if (chart.getCTChart().getTitle().getLayout() != null) {
+		if (chart.getCTChart().getTitle().getLayout() != null
+				&& chart.getCTChart().getTitle().getLayout().isSetManualLayout()) {
 			ManualLayout manualLayout = new ManualLayout();
 			CTManualLayout ctLayout = ctTitle.getLayout().getManualLayout();
 			manualLayout.setManualLayout(ctLayout.isSetLayoutTarget());
 			manualLayout.setxMode(ctLayout.getXMode().getVal().toString());
 			manualLayout.setyMode(ctLayout.getYMode().getVal().toString());
-			manualLayout.setX(ctLayout.getX().getVal());
-			manualLayout.setY(ctLayout.getY().getVal());
-			manualLayout.setH(ctLayout.getH().getVal());
-			manualLayout.setW(ctLayout.getW().getVal());
+			manualLayout.setX(ctLayout.getX() == null ? 0.0 : ctLayout.getX().getVal());
+			manualLayout.setY(ctLayout.getY() == null ? 0.0 : ctLayout.getY().getVal());
+			manualLayout.setH(ctLayout.getH() == null ? 0.0 : ctLayout.getH().getVal());
+			manualLayout.setW(ctLayout.getW() == null ? 0.0 : ctLayout.getW().getVal());
 			title.setManualLayout(manualLayout);
 		}
 
@@ -75,25 +87,62 @@ public class XSLFChartFactory {
 
 		TextProperties txPr = new TextProperties();
 		CTTextBody ctTextBody = ctTitle.getTxPr();
+		if (ctTextBody != null) {
+			BodyProperties bodyPr = new BodyProperties();
+			CTTextBodyProperties ctTextBodyPr = ctTextBody.getBodyPr();
+			bodyPr.setAnchor(ctTextBodyPr.getAnchor().toString());
+			bodyPr.setAnchorCtr(ctTextBodyPr.getAnchorCtr());
+			bodyPr.setRot(ctTextBodyPr.getRot());
+			bodyPr.setSpcFirstLastPara(ctTextBodyPr.getSpcFirstLastPara());
+			bodyPr.setVert(ctTextBodyPr.getVert().toString());
+			bodyPr.setVertOverflow(ctTextBodyPr.getVertOverflow().toString());
+			bodyPr.setWrap(ctTextBodyPr.getWrap().toString());
+			txPr.setBodyPr(bodyPr);
+			TextParagraphs p = new TextParagraphs();
+			TextParagraphProperties pPr = new TextParagraphProperties();
+			DefaultTextRunProperties defRPr = new DefaultTextRunProperties();
+			CTTextCharacterProperties ctTextCharacterPr = ctTextBody.getPList().get(0).getPPr().getDefRPr();
+			defRPr.setSz(ctTextCharacterPr.getSz());
+			pPr.setDefRPr(defRPr);
+			p.setpPr(pPr);
+			txPr.setP(p);
+			title.setTxPr(txPr);
+		}
 
-		BodyProperties bodyPr = new BodyProperties();
-		CTTextBodyProperties ctTextBodyPr = ctTextBody.getBodyPr();
-		bodyPr.setAnchor(ctTextBodyPr.getAnchor().toString());
-		bodyPr.setAnchorCtr(ctTextBodyPr.getAnchorCtr());
-		bodyPr.setRot(ctTextBodyPr.getRot());
-		bodyPr.setSpcFirstLastPara(ctTextBodyPr.getSpcFirstLastPara());
-		bodyPr.setVert(ctTextBodyPr.getVert().toString());
-		bodyPr.setVertOverflow(ctTextBodyPr.getVertOverflow().toString());
-		bodyPr.setWrap(ctTextBodyPr.getWrap().toString());
-		TextParagraphs p = new TextParagraphs();
-		CTTextCharacterProperties ctTextCharacterPr = ctTextBody.getPList().get(0).getPPr().getDefRPr();
-		p.setB(ctTextCharacterPr.getB());
-		p.setBaseline(ctTextCharacterPr.getBaseline());
-
-		txPr.setBodyPr(bodyPr);
-		txPr.setP(p);
-
-		title.setTxPr(txPr);
+		ChartText tx = new ChartText();
+		CTTx ctTx = ctTitle.getTx();
+		if (ctTx != null) {
+			RichText rich = new RichText();
+			TextParagraphs p = new TextParagraphs();
+			List<TextRun> rList = new ArrayList<TextRun>();
+			for (CTRegularTextRun tRun : ctTx.getRich().getPList().get(0).getRList()) {
+				TextRun r = new TextRun();
+				TextRunProperties rPr = new TextRunProperties();
+				rPr.setSz(tRun.getRPr().getSz());
+				ComplexScriptFont cs = new ComplexScriptFont();
+				cs.setTypeface(tRun.getRPr().getCs().getTypeface());
+				EastAsianFont ea = new EastAsianFont();
+				ea.setTypeface(tRun.getRPr().getEa().getTypeface());
+				LatinFont latin = new LatinFont();
+				latin.setTypeface(tRun.getRPr().getLatin().getTypeface());
+				rPr.setEa(ea);
+				rPr.setCs(cs);
+				rPr.setLatin(latin);
+				r.setrPr(rPr);
+				r.setT(tRun.getT());
+				rList.add(r);
+			}
+			p.setR(rList);
+			TextParagraphProperties pPr = new TextParagraphProperties();
+			DefaultTextRunProperties defRPr = new DefaultTextRunProperties();
+			defRPr.setSz(ctTx.getRich().getPList().get(0).getPPr().getDefRPr().getSz());
+			pPr.setDefRPr(defRPr);
+			p.setpPr(pPr);
+			rich.setP(p);
+			tx.setRich(rich);
+			title.setTx(tx);
+		}
+		columnChart.setTitle(title);
 
 		PlotArea plotArea = new PlotArea();
 		CTPlotArea ctPlotArea = chart.getCTChart().getPlotArea();
@@ -170,8 +219,10 @@ public class XSLFChartFactory {
 			SolidFill solidFill = new SolidFill();
 			SchemeColor schemeClr = new SchemeColor();
 			schemeClr.setVal(ctShapePr.getSolidFill().getSchemeClr().getVal().toString());
-			schemeClr.setLumMod(ctShapePr.getSolidFill().getSchemeClr().getLumModList().get(0).getVal());
-			schemeClr.setLumOff(ctShapePr.getSolidFill().getSchemeClr().getLumOffList().get(0).getVal());
+			if (!ctShapePr.getSolidFill().getSchemeClr().getLumModList().isEmpty()) {
+				schemeClr.setLumMod(ctShapePr.getSolidFill().getSchemeClr().getLumModList().get(0).getVal());
+				schemeClr.setLumOff(ctShapePr.getSolidFill().getSchemeClr().getLumOffList().get(0).getVal());
+			}
 			solidFill.setSchemeClr(schemeClr);
 			spPr.setSolidFill(solidFill);
 		} else if (ctShapePr.getGradFill() != null) {
