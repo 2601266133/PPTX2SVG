@@ -25,7 +25,18 @@ public class ColumnClusteredChart {
 	XFrame xfrm;
 	ChartArea chartArea;
 	Title title;
+
+	/**
+	 * clustered default <c:x val="2.858505458556811E-2"/>
+	 * <c:y val="0.1285225372057974"/> <c:w val="0.95812992125984253"/>
+	 * <c:h val="0.71045388797652587"/>
+	 * 
+	 * default x: 0.02858505458556811 y: 0.1285225372057974 w: 0.95812992125984253
+	 * h: 0.71045388797652587
+	 * 
+	 */
 	PlotArea plotArea;
+
 	Legend legend;
 	boolean autoTitleDeleted;
 	boolean plotVisOnly;

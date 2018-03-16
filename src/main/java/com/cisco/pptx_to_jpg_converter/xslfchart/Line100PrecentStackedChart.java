@@ -11,7 +11,9 @@ public class Line100PrecentStackedChart {
 	XFrame xfrm;
 	ChartArea chartArea;
 	Title title;
+
 	PlotArea plotArea;
+
 	Legend legend;
 	boolean autoTitleDeleted;
 	boolean plotVisOnly;

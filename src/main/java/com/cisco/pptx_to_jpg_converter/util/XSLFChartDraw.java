@@ -1,48 +1,34 @@
 package com.cisco.pptx_to_jpg_converter.util;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.block.BlockParams;
-import org.jfree.chart.block.EntityBlockResult;
-import org.jfree.chart.block.LengthConstraintType;
-import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.chart.title.Title;
-import org.jfree.chart.util.ParamChecks;
-import org.jfree.data.Range;
-import org.jfree.text.G2TextMeasurer;
-import org.jfree.text.TextBlock;
-import org.jfree.text.TextUtilities;
 import org.jfree.ui.Align;
-import org.jfree.ui.HorizontalAlignment;
-import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
-import org.jfree.ui.Size2D;
-import org.jfree.ui.VerticalAlignment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cisco.pptx_to_jpg_converter.xslfchart.ColumnStackedChart;
+import com.cisco.pptx_to_jpg_converter.xslfchart.XSLFChartConstants;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.XFrame;
+import com.cisco.pptx_to_jpg_converter.xslfchart.style.Legend;
+import com.cisco.pptx_to_jpg_converter.xslfchart.style.PlotArea;
 
 public class XSLFChartDraw {
+
+	private static final Logger logger = LoggerFactory.getLogger(XSLFChartDraw.class);
 
 	/**
 	 * Rendering hints that will be used for chart drawing. This should never be
@@ -98,232 +84,132 @@ public class XSLFChartDraw {
 	 */
 	private boolean notify;
 
-	public void draw(Graphics2D g2, Rectangle2D chartArea, Point2D anchor, ChartRenderingInfo info) {
-		// notifyListeners(new ChartProgressEvent(this, this,
-		// ChartProgressEvent.DRAWING_STARTED, 0));
-
-		EntityCollection entities = null;
-		// record the chart area, if info is requested...
-		if (info != null) {
-			info.clear();
-			info.setChartArea(chartArea);
-			entities = info.getEntityCollection();
-		}
-		if (entities != null) {
-			// entities.add(new JFreeChartEntity((Rectangle2D) chartArea.clone(), this));
-		}
-
-		// ensure no drawing occurs outside chart area...
-		Shape savedClip = g2.getClip();
-		g2.clip(chartArea);
-
-		g2.addRenderingHints(this.renderingHints);
-
-		// draw the chart background...
-		if (this.backgroundPaint != null) {
-			g2.setPaint(this.backgroundPaint);
-			g2.fill(chartArea);
-		}
-
-		if (this.backgroundImage != null) {
-			Composite originalComposite = g2.getComposite();
-			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.backgroundImageAlpha));
-			Rectangle2D dest = new Rectangle2D.Double(0.0, 0.0, this.backgroundImage.getWidth(null),
-					this.backgroundImage.getHeight(null));
-			Align.align(dest, chartArea, this.backgroundImageAlignment);
-			g2.drawImage(this.backgroundImage, (int) dest.getX(), (int) dest.getY(), (int) dest.getWidth(),
-					(int) dest.getHeight(), null);
-			g2.setComposite(originalComposite);
-		}
-
-		if (isBorderVisible()) {
-			Paint paint = getBorderPaint();
-			Stroke stroke = getBorderStroke();
-			if (paint != null && stroke != null) {
-				Rectangle2D borderArea = new Rectangle2D.Double(chartArea.getX(), chartArea.getY(),
-						chartArea.getWidth() - 1.0, chartArea.getHeight() - 1.0);
-				g2.setPaint(paint);
-				g2.setStroke(stroke);
-				g2.draw(borderArea);
-			}
-		}
-
-		// draw the title and subtitles...
-		Rectangle2D nonTitleArea = new Rectangle2D.Double();
-		nonTitleArea.setRect(chartArea);
-		this.padding.trim(nonTitleArea);
-
-		if (this.title != null && this.title.isVisible()) {
-			EntityCollection e = drawTitle(this.title, g2, nonTitleArea, (entities != null));
-			if (e != null && entities != null) {
-				entities.addAll(e);
-			}
-		}
-
-		Iterator iterator = this.subtitles.iterator();
-		while (iterator.hasNext()) {
-			Title currentTitle = (Title) iterator.next();
-			if (currentTitle.isVisible()) {
-				EntityCollection e = drawTitle(currentTitle, g2, nonTitleArea, (entities != null));
-				if (e != null && entities != null) {
-					entities.addAll(e);
-				}
-			}
-		}
-
-		Rectangle2D plotArea = nonTitleArea;
-
-		// draw the plot (axes and data visualisation)
-		PlotRenderingInfo plotInfo = null;
-		if (info != null) {
-			plotInfo = info.getPlotInfo();
-		}
-		this.plot.draw(g2, plotArea, anchor, null, plotInfo);
-
-		g2.setClip(savedClip);
-
-		// notifyListeners(new ChartProgressEvent(this, this,
-		// ChartProgressEvent.DRAWING_FINISHED, 100));
-	}
-
-	/**
-	 * Returns a flag that controls whether or not a border is drawn around the
-	 * outside of the chart.
-	 *
-	 * @return A boolean.
-	 *
-	 * @see #setBorderVisible(boolean)
-	 */
-	public boolean isBorderVisible() {
-		return this.borderVisible;
-	}
-
-	/**
-	 * Returns the paint used to draw the chart border (if visible).
-	 *
-	 * @return The border paint.
-	 *
-	 * @see #setBorderPaint(Paint)
-	 */
-	public Paint getBorderPaint() {
-		return this.borderPaint;
-	}
-
-	/**
-	 * Returns the stroke used to draw the chart border (if visible).
-	 *
-	 * @return The border stroke.
-	 *
-	 * @see #setBorderStroke(Stroke)
-	 */
-	public Stroke getBorderStroke() {
-		return this.borderStroke;
-	}
-
-	protected EntityCollection drawTitle(Title t, Graphics2D g2, Rectangle2D area, boolean entities) {
-
-		ParamChecks.nullNotPermitted(t, "t");
-		ParamChecks.nullNotPermitted(area, "area");
-		Rectangle2D titleArea;
-		RectangleEdge position = t.getPosition();
-		double ww = area.getWidth();
-		if (ww <= 0.0) {
-			return null;
-		}
-		double hh = area.getHeight();
-		if (hh <= 0.0) {
-			return null;
-		}
-		RectangleConstraint constraint = new RectangleConstraint(ww, new Range(0.0, ww), LengthConstraintType.RANGE, hh,
-				new Range(0.0, hh), LengthConstraintType.RANGE);
-		Object retValue = null;
-		BlockParams p = new BlockParams();
-		p.setGenerateEntities(entities);
-		if (position == RectangleEdge.TOP) {
-			Size2D size = t.arrange(g2, constraint);
-			titleArea = createAlignedRectangle2D(size, area, t.getHorizontalAlignment(), VerticalAlignment.TOP);
-			retValue = t.draw(g2, titleArea, p);
-			area.setRect(area.getX(), Math.min(area.getY() + size.height, area.getMaxY()), area.getWidth(),
-					Math.max(area.getHeight() - size.height, 0));
-		} else if (position == RectangleEdge.BOTTOM) {
-			Size2D size = t.arrange(g2, constraint);
-			titleArea = createAlignedRectangle2D(size, area, t.getHorizontalAlignment(), VerticalAlignment.BOTTOM);
-			retValue = t.draw(g2, titleArea, p);
-			area.setRect(area.getX(), area.getY(), area.getWidth(), area.getHeight() - size.height);
-		} else if (position == RectangleEdge.RIGHT) {
-			Size2D size = t.arrange(g2, constraint);
-			titleArea = createAlignedRectangle2D(size, area, HorizontalAlignment.RIGHT, t.getVerticalAlignment());
-			retValue = t.draw(g2, titleArea, p);
-			area.setRect(area.getX(), area.getY(), area.getWidth() - size.width, area.getHeight());
-		}
-
-		else if (position == RectangleEdge.LEFT) {
-			Size2D size = t.arrange(g2, constraint);
-			titleArea = createAlignedRectangle2D(size, area, HorizontalAlignment.LEFT, t.getVerticalAlignment());
-			retValue = t.draw(g2, titleArea, p);
-			area.setRect(area.getX() + size.width, area.getY(), area.getWidth() - size.width, area.getHeight());
-		} else {
-			throw new RuntimeException("Unrecognised title position.");
-		}
-		EntityCollection result = null;
-		if (retValue instanceof EntityBlockResult) {
-			EntityBlockResult ebr = (EntityBlockResult) retValue;
-			result = ebr.getEntityCollection();
-		}
-		return result;
-	}
-
-	private Rectangle2D createAlignedRectangle2D(Size2D dimensions, Rectangle2D frame, HorizontalAlignment hAlign,
-			VerticalAlignment vAlign) {
-		double x = Double.NaN;
-		double y = Double.NaN;
-		if (hAlign == HorizontalAlignment.LEFT) {
-			x = frame.getX();
-		} else if (hAlign == HorizontalAlignment.CENTER) {
-			x = frame.getCenterX() - (dimensions.width / 2.0);
-		} else if (hAlign == HorizontalAlignment.RIGHT) {
-			x = frame.getMaxX() - dimensions.width;
-		}
-		if (vAlign == VerticalAlignment.TOP) {
-			y = frame.getY();
-		} else if (vAlign == VerticalAlignment.CENTER) {
-			y = frame.getCenterY() - (dimensions.height / 2.0);
-		} else if (vAlign == VerticalAlignment.BOTTOM) {
-			y = frame.getMaxY() - dimensions.height;
-		}
-
-		return new Rectangle2D.Double(x, y, dimensions.width, dimensions.height);
-	}
-
-	public void drawColumnCahrt(ColumnStackedChart chart, Graphics2D graphic) {
+	public static void drawColumnCahrt(ColumnStackedChart chart, Graphics2D graphic) {
+		drawChartArea(graphic, chart.getXfrm());
 		drawTitle(chart.getTitle(), graphic, chart.getXfrm());
+		ColumnStackedChart.drawChartPlotArea(chart.getPlotArea(), graphic, chart.getXfrm());
+		drawChartLegendArea(chart.getLegend(), chart.getPlotArea(), graphic, chart.getXfrm());
+	}
+
+	public static void drawChartArea(Graphics2D graphic, XFrame xframe) {
+		Rectangle2D rtc = new Rectangle2D.Double(xframe.getOffX(), xframe.getOffY(), xframe.getWidth(),
+				xframe.getHeight());
+		graphic.setColor(Color.WHITE);
+		graphic.fill(rtc);
+
 	}
 
 	public static void drawTitle(com.cisco.pptx_to_jpg_converter.xslfchart.style.Title title, Graphics2D graphic,
 			XFrame xframe) {
 
-		Rectangle2D titleArea;
-		double ww = xframe.getWidth();
-		Object retValue = null;
-		BlockParams p = new BlockParams();
+		if (title != null) {
 
-		TextBlock content;
-		Font font = new Font(title.getTitleFontStyle(), Font.PLAIN, Integer.valueOf(title.getTitleFontSize() / 100));
-		Paint paint = Color.black;
-		String text = title.getTitleContentText();
-		int maximumLinesToDisplay = Integer.MAX_VALUE;
-		HorizontalAlignment textAlignment = HorizontalAlignment.CENTER;
-		graphic.getFontMetrics(font).stringWidth(text);
+			String text = title.getTitleContentText();
 
-		RectangleEdge position = RectangleEdge.TOP;
-		if (position == RectangleEdge.TOP || position == RectangleEdge.BOTTOM) {
-			float maxWidth = Float.MAX_VALUE;
+			Font font = new Font(title.getTitleFontStyle(), Font.PLAIN,
+					Integer.valueOf(title.getTitleFontSize() / 100));
+			FontMetrics fm = graphic.getFontMetrics(font);
+			double width = fm.stringWidth(text);
+			double height = fm.getHeight();
+
+			double x = xframe.getOffX() + xframe.getWidth() / 2 - width / 2;
+			double y = xframe.getOffY() + XSLFChartConstants.TITLE_DEFAULT_OFFSET_Y;
+			if (title.getManualLayout() != null) {
+				x = xframe.getOffX() + xframe.getWidth() * title.getManualLayout().getX();
+				y = xframe.getOffY() + xframe.getHeight() * title.getManualLayout().getY();
+			}
+
+			Rectangle2D rtc = new Rectangle2D.Double(x, y, width, height);
+			graphic.setColor(Color.WHITE);
+			graphic.fill(rtc);
+
+			graphic.setColor(Color.BLACK);
 			graphic.setFont(font);
-			content = TextUtilities.createTextBlock(text, font, paint, maxWidth, maximumLinesToDisplay,
-					new G2TextMeasurer(graphic));
-			content.setLineAlignment(textAlignment);
-			Size2D contentSize = content.calculateDimensions(graphic);
+			graphic.drawString(text, Float.valueOf(String.valueOf(x)), Float.valueOf(String.valueOf(y))
+					+ Float.valueOf(String.valueOf(Integer.valueOf(title.getTitleFontSize() / 100))));
+
+		}
+		// RectangleEdge position = RectangleEdge.TOP;
+		// if (position == RectangleEdge.TOP || position == RectangleEdge.BOTTOM) {
+		// float maxWidth = Float.MAX_VALUE;
+		// graphic.setFont(font);
+		// content = TextUtilities.createTextBlock(text, font, paint, maxWidth,
+		// maximumLinesToDisplay,
+		// new G2TextMeasurer(graphic));
+		// content.setLineAlignment(textAlignment);
+		// Size2D contentSize = content.calculateDimensions(graphic);
+		// }
+
+	}
+
+	public static void drawChartPlotArea(PlotArea plotArea, Graphics2D graphic, XFrame xframe) {
+	}
+
+	public static void drawChartLegendArea(Legend legend, PlotArea plotArea, Graphics2D graphic, XFrame xframe) {
+		if (legend != null && legend.getManualLayout() != null) {
+			double width = xframe.getWidth() * legend.getManualLayout().getW();
+			double height = xframe.getHeight() * legend.getManualLayout().getH();
+
+			double x = xframe.getOffX() + xframe.getWidth() * legend.getManualLayout().getX();
+			double y = xframe.getOffY() + xframe.getHeight() * legend.getManualLayout().getY();
+
+			Rectangle2D rtc = new Rectangle2D.Double(x, y, width, height);
+			graphic.setColor(Color.WHITE);
+			graphic.fill(rtc);
+
+			int seriesNum = plotArea.getSerList().size();
+			for (int i = 0; i < seriesNum; i++) {
+
+				String currentSerStr = plotArea.getSerList().get(i).getTx().getV();
+				int fontSize = Integer.valueOf(legend.getTxPr().getTextSize() / 100);
+				Font font = new Font(legend.getTxPr().getTextFont(), Font.PLAIN, fontSize);
+				FontMetrics fm = graphic.getFontMetrics(font);
+				double currentSerStrWidth = fm.stringWidth(currentSerStr);
+				double x1 = x + width / seriesNum / 2 - currentSerStrWidth / 2 + i * width / seriesNum;
+				double y1 = y + height / 2 - fontSize / 2;
+				Rectangle2D rtcCatArea = new Rectangle2D.Double(x1, y1, fontSize, fontSize);
+				graphic.setColor(Color.BLACK);
+				graphic.fill(rtcCatArea);
+
+				graphic.setColor(Color.BLACK);
+				graphic.setFont(font);
+				graphic.drawString(currentSerStr, (int) (x1 + fontSize), (int) (y1 + fontSize));
+			}
 		}
 	}
 
+	public static double getMajorUnitsForNumber(Double k) {
+		double defaultMajorUnits = 1.0;
+		if (k < 5.0) {
+
+		} else if (k >= 5) {
+			int length = (int) Math.log10(k) + 1;
+			double scaledK = k;
+			if (length > 2) {
+				length = length - 2;
+				scaledK = scaledK / Math.pow(10, length);
+			} else {
+				length = 0;
+			}
+
+			if (scaledK < 10.0) {
+				defaultMajorUnits = 1 * Math.pow(10, length);
+			} else if (10 <= scaledK && scaledK < 20) {
+				defaultMajorUnits = 2 * Math.pow(10, length);
+			} else if (20 <= scaledK && scaledK < 50) {
+				defaultMajorUnits = 5 * Math.pow(10, length);
+			}
+		}
+		return defaultMajorUnits;
+	}
+
+	private static void drawGradientColor(int x, int y, int width, int height, int colorAreasNum, Graphics2D graphic) {
+		int w = height; // 分成六个部分进行绘制
+		for (int i = 0; i < w; i++) {
+			int d = (int) (i * (255.0 / w)); // 使d从0递增到255，实际可能只是接近255
+			// 画第一部分颜色---红色到黄色
+			graphic.setColor(new Color(255, d, 0)); // 设置颜色
+			graphic.drawLine(x, y + i, x + width, y + i); // 画直线---一条单色竖线
+		}
+	}
 }

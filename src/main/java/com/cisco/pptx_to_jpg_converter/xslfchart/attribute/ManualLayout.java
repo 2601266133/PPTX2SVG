@@ -4,12 +4,21 @@ public class ManualLayout {
 
 	boolean manualLayout;
 
+	String layoutTarget;
 	String xMode;
 	String yMode;
 	double x;
 	double y;
 	double w;
 	double h;
+
+	public String getLayoutTarget() {
+		return layoutTarget;
+	}
+
+	public void setLayoutTarget(String layoutTarget) {
+		this.layoutTarget = layoutTarget;
+	}
 
 	public boolean isManualLayout() {
 		return manualLayout;

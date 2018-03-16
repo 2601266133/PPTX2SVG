@@ -17,7 +17,11 @@ public class Title {
 	 * §5.7.2.215 txPr (Text Properties) §5.7.2.217
 	 */
 
+	/**
+	 * y方向上距离Xframe的距离应该是个固定值，大约是 6.0Point
+	 */
 	ManualLayout manualLayout;
+
 	boolean overlay;
 	ShapeProperties spPr;
 	TextProperties txPr;
@@ -64,11 +68,9 @@ public class Title {
 	}
 
 	public String getTitleFontStyle() {
-		String fontStyle = "";
+		String fontStyle = "等线";
 		if (tx != null && tx.getRich().getP().getR() != null) {
 			fontStyle = tx.getRich().getP().getR().get(0).getrPr().getEa().getTypeface();
-		} else {
-			fontStyle = "";
 		}
 		return fontStyle;
 	}
@@ -80,13 +82,13 @@ public class Title {
 				textContent = textContent.trim() + " " + r.getT();
 			}
 		} else {
-			textContent = "default text judged by chart type";
+			textContent = "Chart Title";
 		}
 		return textContent.trim();
 	}
 
 	public int getTitleFontSize() {
-		int fontSize = 0;
+		int fontSize = 1860;
 		if (tx != null) {
 			if (tx.getRich().getP().getR() != null) {
 				fontSize = tx.getRich().getP().getR().get(0).getrPr().getSz();
@@ -99,4 +101,5 @@ public class Title {
 
 		return fontSize;
 	}
+
 }

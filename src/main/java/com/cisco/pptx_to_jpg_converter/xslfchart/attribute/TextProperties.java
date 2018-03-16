@@ -5,6 +5,14 @@ public class TextProperties {
 	BodyProperties bodyPr;
 	TextParagraphs p;
 
+	public String getTextFont() {
+		return p.getpPr().getDefRPr().getEa() != null ? p.getpPr().getDefRPr().getEa().getTypeface() : "等线";
+	}
+
+	public int getTextSize() {
+		return p.getpPr().getDefRPr().getSz();
+	}
+
 	public BodyProperties getBodyPr() {
 		return bodyPr;
 	}

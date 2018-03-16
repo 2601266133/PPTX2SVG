@@ -2,6 +2,7 @@ package com.cisco.pptx_to_jpg_converter.xslfchart.style;
 
 import java.util.List;
 
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ManualLayout;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.Series;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ShapeProperties;
 
@@ -28,6 +29,8 @@ import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ShapeProperties;
 
 public class PlotArea {
 
+	ManualLayout manualLayout;
+
 	String barDir; // Bar Direction a bar (horizontal) or a column (vertical)
 	String grouping;
 	boolean varyColors;
@@ -35,11 +38,27 @@ public class PlotArea {
 	DataLabel dLbls;
 
 	int gapWidth;
-	String overlap;// 列的百分数
+	int overlap;// 列的百分数
 
-	CategoryAxis catAx;
-	ValueAxis valAx;
+	List<CategoryAxis> catAxList;
+	List<ValueAxis> valAxList;
 	ShapeProperties spPr;
+
+	public List<ValueAxis> getValAxList() {
+		return valAxList;
+	}
+
+	public void setValAxList(List<ValueAxis> valAxList) {
+		this.valAxList = valAxList;
+	}
+
+	public ManualLayout getManualLayout() {
+		return manualLayout;
+	}
+
+	public void setManualLayout(ManualLayout manualLayout) {
+		this.manualLayout = manualLayout;
+	}
 
 	public String getBarDir() {
 		return barDir;
@@ -89,28 +108,20 @@ public class PlotArea {
 		this.gapWidth = gapWidth;
 	}
 
-	public String getOverlap() {
+	public int getOverlap() {
 		return overlap;
 	}
 
-	public void setOverlap(String overlap) {
+	public void setOverlap(int overlap) {
 		this.overlap = overlap;
 	}
 
-	public CategoryAxis getCatAx() {
-		return catAx;
+	public List<CategoryAxis> getCatAxList() {
+		return catAxList;
 	}
 
-	public void setCatAx(CategoryAxis catAx) {
-		this.catAx = catAx;
-	}
-
-	public ValueAxis getValAx() {
-		return valAx;
-	}
-
-	public void setValAx(ValueAxis valAx) {
-		this.valAx = valAx;
+	public void setCatAxList(List<CategoryAxis> catAxList) {
+		this.catAxList = catAxList;
 	}
 
 	public ShapeProperties getSpPr() {

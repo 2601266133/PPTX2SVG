@@ -51,7 +51,35 @@ public class DefaultTextRunProperties {
 	int sz;
 	String endParaRPr;
 
+	ComplexScriptFont cs;
+	EastAsianFont ea;
+	LatinFont latin;
+
 	String fillType;
+
+	public ComplexScriptFont getCs() {
+		return cs;
+	}
+
+	public void setCs(ComplexScriptFont cs) {
+		this.cs = cs;
+	}
+
+	public EastAsianFont getEa() {
+		return ea;
+	}
+
+	public void setEa(EastAsianFont ea) {
+		this.ea = ea;
+	}
+
+	public LatinFont getLatin() {
+		return latin;
+	}
+
+	public void setLatin(LatinFont latin) {
+		this.latin = latin;
+	}
 
 	public int getBaseline() {
 		return baseline;

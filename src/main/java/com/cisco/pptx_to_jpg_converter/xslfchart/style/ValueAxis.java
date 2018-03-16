@@ -5,6 +5,8 @@ import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.TextProperties;
 
 /**
  * 
+ * part 4, 5.7.2.227 valAx (Value Axis)
+ * 
  * axId (Axis ID) §5.7.2.9 axPos (Axis Position) §5.7.2.10 crossAx (Crossing
  * Axis ID) §5.7.2.31 crossBetween (Cross Between) §5.7.2.32 crosses (Crosses)
  * §5.7.2.33 crossesAt (Crossing Value) §5.7.2.34 delete (Delete) §5.7.2.40
@@ -43,7 +45,7 @@ public class ValueAxis {
 	GridlineMajor majorGridlines;
 
 	// numFrt
-	String sourceLinked;//
+	boolean sourceLinked;//
 	String formatCode;//
 
 	String majorTickMark;
@@ -56,6 +58,41 @@ public class ValueAxis {
 	String crossAxis;
 	String crosssers;
 	String crossBetween;
+
+	String font;
+
+	Title title;
+
+	public String getTextFont() {
+		if (txPr.getP() == null) {
+			return "等线";
+		}
+		return txPr.getP().getpPr().getDefRPr().getEa() != null ? txPr.getP().getpPr().getDefRPr().getEa().getTypeface()
+				: "等线";
+	}
+
+	public int getTextSize() {
+		if (txPr.getP() == null) {
+			return 12;
+		}
+		return txPr.getP().getpPr().getDefRPr().getSz();
+	}
+
+	public String getFont() {
+		return font;
+	}
+
+	public void setFont(String font) {
+		this.font = font;
+	}
+
+	public Title getTitle() {
+		return title;
+	}
+
+	public void setTitle(Title title) {
+		this.title = title;
+	}
 
 	public String getAxId() {
 		return axId;
@@ -113,11 +150,11 @@ public class ValueAxis {
 		this.majorGridlines = majorGridlines;
 	}
 
-	public String getSourceLinked() {
+	public boolean getSourceLinked() {
 		return sourceLinked;
 	}
 
-	public void setSourceLinked(String sourceLinked) {
+	public void setSourceLinked(boolean sourceLinked) {
 		this.sourceLinked = sourceLinked;
 	}
 

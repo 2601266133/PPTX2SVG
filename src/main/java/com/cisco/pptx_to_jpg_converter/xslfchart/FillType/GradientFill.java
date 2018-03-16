@@ -6,6 +6,13 @@ import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.GradientStop;
 
 /**
  * gsLst
+ * 
+ * 5.1.10.33 gradFill (Gradient Fill)
+ * 
+ * 
+ * gsLst (Gradient Stop List) §5.1.10.37 lin (Linear Gradient Fill) §5.1.10.41
+ * path (Path Gradient) §5.1.10.46 tileRect (Tile Rectangle) §5.1.10.59
+ * 
  **/
 
 public class GradientFill {

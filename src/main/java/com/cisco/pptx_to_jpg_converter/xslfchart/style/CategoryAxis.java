@@ -30,7 +30,7 @@ public class CategoryAxis {
 	String axPos;
 
 	// numFmt
-	String sourceLinked;
+	boolean sourceLinked;
 	String formatCode;
 
 	String majorTickMark;
@@ -45,8 +45,43 @@ public class CategoryAxis {
 
 	boolean auto;
 	String lblAlgn;
-	String lblOffset;
+	int lblOffset;
 	boolean noMultiLvlLbl;
+
+	String font;
+
+	Title title;
+
+	public Title getTitle() {
+		return title;
+	}
+
+	public void setTitle(Title title) {
+		this.title = title;
+	}
+
+	public String getTextFont() {
+		if (txPr.getP() == null) {
+			return "等线";
+		}
+		return txPr.getP().getpPr().getDefRPr().getEa() != null ? txPr.getP().getpPr().getDefRPr().getEa().getTypeface()
+				: "等线";
+	}
+
+	public int getTextSize() {
+		if (txPr.getP() == null) {
+			return 12;
+		}
+		return txPr.getP().getpPr().getDefRPr().getSz();
+	}
+
+	public String getFont() {
+		return font;
+	}
+
+	public void setFont(String font) {
+		this.font = font;
+	}
 
 	public String getAxId() {
 		return axId;
@@ -80,11 +115,11 @@ public class CategoryAxis {
 		this.axPos = axPos;
 	}
 
-	public String getSourceLinked() {
+	public boolean getSourceLinked() {
 		return sourceLinked;
 	}
 
-	public void setSourceLinked(String sourceLinked) {
+	public void setSourceLinked(boolean sourceLinked) {
 		this.sourceLinked = sourceLinked;
 	}
 
@@ -168,11 +203,11 @@ public class CategoryAxis {
 		this.lblAlgn = lblAlgn;
 	}
 
-	public String getLblOffset() {
+	public int getLblOffset() {
 		return lblOffset;
 	}
 
-	public void setLblOffset(String lblOffset) {
+	public void setLblOffset(int lblOffset) {
 		this.lblOffset = lblOffset;
 	}
 

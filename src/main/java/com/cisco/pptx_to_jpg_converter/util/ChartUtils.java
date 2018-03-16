@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cisco.pptx_to_jpg_converter.model.ChartObj;
-import com.cisco.pptx_to_jpg_converter.xslfchart.ColumnClusteredChart;
+import com.cisco.pptx_to_jpg_converter.xslfchart.ColumnStackedChart;
 import com.orsoncharts.Chart3D;
 import com.orsoncharts.Chart3DFactory;
 import com.orsoncharts.data.DefaultKeyedValues;
@@ -99,13 +99,18 @@ public class ChartUtils {
 		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getH().toString());
 
 		// -test
-
+		String barType = "";
 		List<CTBarChart> barList = chart.getCTChart().getPlotArea().getBarChartList();
 		if (barList.size() > 0) {
 			for (CTBarChart bar : barList) {
+				// test
+				ColumnStackedChart ccChart = XSLFChartFactory.createColumnStackedChart(chart, slide);
+				XSLFChartDraw.drawColumnCahrt(ccChart, graphics);
+
 				List<ChartObj> chartObjList = new ArrayList<ChartObj>();
 				String title = getBarChartTitle(chart);
 				bar.getAxIdList();
+				barType = bar.getGrouping().getVal().toString();
 				for (CTBarSer ser : bar.getSerList()) {
 					String idx = String.valueOf(ser.getIdx().getVal());
 					String order = String.valueOf(ser.getOrder().getVal());
@@ -246,21 +251,10 @@ public class ChartUtils {
 				// customBarRenderer.setItemMargin(rectangle.getWidth() * Double
 				// .valueOf(Double.valueOf(-bar.getOverlap().xgetVal().getIntValue()) /
 				// Double.valueOf(100)));
-				barChart.draw(graphics, rectangle, null);
+				// barChart.draw(graphics, rectangle, null);
 			}
 
 		}
-		// test
-		ColumnClusteredChart ccChart = XSLFChartFactory.createColumnClusteredChart(chart, slide);
-		Rectangle2D rtc = new Rectangle2D.Double(rectangle.getX(), rectangle.getY(), rectangle.getWidth(),
-				rectangle.getHeight());
-		graphics.setColor(Color.PINK);
-		graphics.fill(rtc);
-		XSLFChartDraw.drawTitle(ccChart.getTitle(), graphics, ccChart.getXfrm());
-
-		graphics.getSVGElement();
-		// -test
-
 	}
 
 	public static void set3DBarChart(XSLFChart chart, SVGGraphics2D graphics, XSLFSlide slide) {

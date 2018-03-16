@@ -20,6 +20,15 @@ package com.cisco.pptx_to_jpg_converter.xslfchart.attribute;
 public class TextParagraphProperties {
 
 	DefaultTextRunProperties defRPr;
+	LineSpace lnSpc;
+
+	public LineSpace getLnSpc() {
+		return lnSpc;
+	}
+
+	public void setLnSpc(LineSpace lnSpc) {
+		this.lnSpc = lnSpc;
+	}
 
 	public DefaultTextRunProperties getDefRPr() {
 		return defRPr;
