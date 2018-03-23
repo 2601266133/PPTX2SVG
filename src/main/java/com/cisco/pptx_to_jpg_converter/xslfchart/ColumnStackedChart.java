@@ -280,9 +280,10 @@ public class ColumnStackedChart {
 
 				double cvHeight = catFontheight + Double.valueOf(catAx.getLblOffset()) / 100
 						+ Double.valueOf(spcpct / 100000) * 1 / 2 * catFontheight;
-				Rectangle2D rtcCatArea = new Rectangle2D.Double(x, y + height, width, cvHeight);
-				graphic.setColor(Color.WHITE);
-				graphic.fill(rtcCatArea);
+				// Rectangle2D rtcCatArea = new Rectangle2D.Double(x, y + height, width,
+				// cvHeight);
+				// graphic.setColor(Color.WHITE);
+				// graphic.fill(rtcCatArea);
 				for (int i = 0; i < seriesNum; i++) {
 					Map<Long, String> catidxVMap = plotArea.getSerList().get(i).getCat().getIdxVMap();
 					Map<Long, String> validxVMap = plotArea.getSerList().get(i).getVal().getIdxVMap();

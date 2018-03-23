@@ -116,6 +116,9 @@ public class PPTFileDownloadController {
 					zipOut.setEncoding("GBK");
 					logger.info("read the image one by one");
 					for (File imageFile : imageFiles) {
+						if (!imageFile.getName().endsWith(".svg")) {
+							continue;
+						}
 						fis = new FileInputStream(imageFile);
 						zipOut.putNextEntry(new ZipEntry(imageFile.getName()));
 						logger.info("Image name: " + imageFile.getName());

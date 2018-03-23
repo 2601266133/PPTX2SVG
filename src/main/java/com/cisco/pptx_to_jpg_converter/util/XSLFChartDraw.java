@@ -113,7 +113,7 @@ public class XSLFChartDraw {
 			double height = fm.getHeight();
 
 			double x = xframe.getOffX() + xframe.getWidth() / 2 - width / 2;
-			double y = xframe.getOffY() + XSLFChartConstants.TITLE_DEFAULT_OFFSET_Y;
+			double y = xframe.getOffY() + XSLFChartConstants.COLUMN_CHART_TITLE_DEFAULT_OFFSET_Y;
 			if (title.getManualLayout() != null) {
 				x = xframe.getOffX() + xframe.getWidth() * title.getManualLayout().getX();
 				y = xframe.getOffY() + xframe.getHeight() * title.getManualLayout().getY();
@@ -146,16 +146,39 @@ public class XSLFChartDraw {
 	}
 
 	public static void drawChartLegendArea(Legend legend, PlotArea plotArea, Graphics2D graphic, XFrame xframe) {
-		if (legend != null && legend.getManualLayout() != null) {
-			double width = xframe.getWidth() * legend.getManualLayout().getW();
-			double height = xframe.getHeight() * legend.getManualLayout().getH();
+		if (legend != null) {
+			double width = 0.0;
+			double height = 0.0;
+			double legendWith = 0.0;
+			double maxFontSize = 0.0;
+			for (int i = 0; i < plotArea.getSerList().size(); i++) {
+				String currentSerStr = plotArea.getSerList().get(i).getTx().getV();
+				int fontSize = Integer.valueOf(legend.getTxPr().getTextSize() / 100);
+				Font font = new Font(legend.getTxPr().getTextFont(), Font.PLAIN, fontSize);
+				if (legend.getIdEntryMap().get((long) i) != null) {
+					fontSize = Integer.valueOf(legend.getIdEntryMap().get((long) i).getTxPr().getTextSize() / 100);
+					font = new Font(legend.getIdEntryMap().get((long) i).getTxPr().getTextFont(), Font.PLAIN, fontSize);
+				}
+				maxFontSize = Math.max(maxFontSize, fontSize);
+				FontMetrics fm = graphic.getFontMetrics(font);
+				height = fm.getHeight() * 2;
+				double currentSerStrWidth = fm.stringWidth(currentSerStr);
+				legendWith += currentSerStrWidth;
+			}
+			width = legendWith + (plotArea.getSerList().size() + 1) * maxFontSize;
 
-			double x = xframe.getOffX() + xframe.getWidth() * legend.getManualLayout().getX();
-			double y = xframe.getOffY() + xframe.getHeight() * legend.getManualLayout().getY();
+			double x = xframe.getOffX() + xframe.getWidth() / 2 - width / 2;
+			double y = xframe.getOffY() + xframe.getHeight() * XSLFChartConstants.COLUMN_CHART_LEGEND_DEFAULT_OFFSET_Y;
+			if (legend.getManualLayout() != null) {
+				x = xframe.getOffX() + xframe.getWidth() * legend.getManualLayout().getX();
+				y = xframe.getOffY() + xframe.getHeight() * legend.getManualLayout().getY();
+				width = xframe.getWidth() * legend.getManualLayout().getW();
+				height = xframe.getHeight() * legend.getManualLayout().getH();
+			}
 
-			Rectangle2D rtc = new Rectangle2D.Double(x, y, width, height);
-			graphic.setColor(Color.WHITE);
-			graphic.fill(rtc);
+			// Rectangle2D rtc = new Rectangle2D.Double(x, y, width, height);
+			// graphic.setColor(Color.WHITE);
+			// graphic.fill(rtc);
 
 			int seriesNum = plotArea.getSerList().size();
 			for (int i = 0; i < seriesNum; i++) {
@@ -163,11 +186,15 @@ public class XSLFChartDraw {
 				String currentSerStr = plotArea.getSerList().get(i).getTx().getV();
 				int fontSize = Integer.valueOf(legend.getTxPr().getTextSize() / 100);
 				Font font = new Font(legend.getTxPr().getTextFont(), Font.PLAIN, fontSize);
+				if (legend.getIdEntryMap().get((long) i) != null) {
+					fontSize = Integer.valueOf(legend.getIdEntryMap().get((long) i).getTxPr().getTextSize() / 100);
+					font = new Font(legend.getIdEntryMap().get((long) i).getTxPr().getTextFont(), Font.PLAIN, fontSize);
+				}
 				FontMetrics fm = graphic.getFontMetrics(font);
 				double currentSerStrWidth = fm.stringWidth(currentSerStr);
 				double x1 = x + width / seriesNum / 2 - currentSerStrWidth / 2 + i * width / seriesNum;
 				double y1 = y + height / 2 - fontSize / 2;
-				Rectangle2D rtcCatArea = new Rectangle2D.Double(x1, y1, fontSize, fontSize);
+				Rectangle2D rtcCatArea = new Rectangle2D.Double(x1, y1, maxFontSize, maxFontSize);
 				graphic.setColor(Color.BLACK);
 				graphic.fill(rtcCatArea);
 

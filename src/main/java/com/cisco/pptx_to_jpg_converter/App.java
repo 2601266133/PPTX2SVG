@@ -32,9 +32,9 @@ public class App extends SpringBootServletInitializer {
 	public MultipartConfigElement multipartConfigElement() {
 		MultipartConfigFactory factory = new MultipartConfigFactory();
 		//// 设置文件大小限制 ,超了，页面会抛出异常信息，这时候就需要进行异常信息的处理了;
-		factory.setMaxFileSize("128MB"); // KB,MB
+		factory.setMaxFileSize("500MB"); // KB,MB
 		/// 设置总上传数据总大小
-		factory.setMaxRequestSize("256MB");
+		factory.setMaxRequestSize("500MB");
 		// Sets the directory location wherefiles will be stored.
 		// factory.setLocation("C:\\Users\\jacsong2\\Desktop\\PPTconvert");
 		return factory.createMultipartConfig();

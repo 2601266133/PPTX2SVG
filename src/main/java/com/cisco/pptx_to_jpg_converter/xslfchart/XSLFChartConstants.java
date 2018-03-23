@@ -17,5 +17,6 @@ public final class XSLFChartConstants {
 	public static final double COLUMN_100PCT_STACKED_PLOT_DEFAULT_LAYOUT_W = 0.9331478945566587;
 	public static final double COLUMN_100PCT_STACKED_PLOT_DEFAULT_LAYOUT_H = 0.71045388797652587;
 
-	public static final double TITLE_DEFAULT_OFFSET_Y = 6.0;
+	public static final double COLUMN_CHART_LEGEND_DEFAULT_OFFSET_Y = 0.92276122884501277;
+	public static final double COLUMN_CHART_TITLE_DEFAULT_OFFSET_Y = 6.0;
 }

@@ -109,14 +109,21 @@ public class PPTFileUploadController {
 				String newName = System.currentTimeMillis() + name;
 				File dest = new File(filePath + newName);
 
-				if (".pptx".equals(suffixName) || ".potx".equals(suffixName) || ".ppsx".equals(suffixName)) {
-					// 1.by LibreOffice
-					// converter = new PPTX2SVGByLibreOffice(file.getInputStream(), pptxImagePath,
-					// "svg");
-					// ((PPTX2SVGByLibreOffice)
-					// converter).setAnotherINStream(file.getInputStream());
+				// 1.by LibreOffice
+				// if (".pptx".equals(suffixName) || ".potx".equals(suffixName) ||
+				// ".ppsx".equals(suffixName)) {
+				// converter = new PPTX2SVGByLibreOffice(file.getInputStream(), pptxImagePath,
+				// "svg");
+				// ((PPTX2SVGByLibreOffice)
+				// converter).setAnotherINStream(file.getInputStream());
+				// } else if (".ppt".equals(suffixName) || ".pps".equals(suffixName)) {
+				// converter = new PPT2SVGByLibreOffice(file.getInputStream(), pptxImagePath,
+				// "svg");
+				// ((PPT2SVGByLibreOffice) converter).setAnotherINStream(file.getInputStream());
+				// }
 
-					// 2. by self
+				// 2. by self and POI
+				if (".pptx".equals(suffixName) || ".potx".equals(suffixName) || ".ppsx".equals(suffixName)) {
 					converter = new PPTXToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
 				} else if (".ppt".equals(suffixName) || ".pps".equals(suffixName)) {
 					converter = new PPTToSVGConverter(file.getInputStream(), pptxImagePath, "svg");

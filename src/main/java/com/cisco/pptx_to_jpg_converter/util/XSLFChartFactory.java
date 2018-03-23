@@ -14,6 +14,7 @@ import org.openxmlformats.schemas.drawingml.x2006.chart.CTBarSer;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTCatAx;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTDPt;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegend;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegendEntry;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTManualLayout;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTNumVal;
 import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
@@ -37,6 +38,7 @@ import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ComplexScriptFont;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.DefaultTextRunProperties;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.EastAsianFont;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.LatinFont;
+import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.LegendEntry;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.LineSpace;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.ManualLayout;
 import com.cisco.pptx_to_jpg_converter.xslfchart.attribute.RichText;
@@ -168,11 +170,28 @@ public class XSLFChartFactory {
 
 		Legend legend = new Legend();
 		CTLegend ctLegend = chart.getCTChart().getLegend();
-		if (ctLegend != null && ctLegend.getLayout() != null && ctLegend.getLayout().getManualLayout() != null) {
-			legend.setManualLayout(getManualLayout(ctLegend.getLayout().getManualLayout()));
-			legend.setSpPr(getShapeProperties(ctLegend.getSpPr()));
-			legend.setTxPr(getTextProperties(ctLegend.getTxPr()));
+		if (ctLegend != null) {
+			if (ctLegend.getLayout() != null && ctLegend.getLayout().getManualLayout() != null) {
+				legend.setManualLayout(getManualLayout(ctLegend.getLayout().getManualLayout()));
+				legend.setSpPr(getShapeProperties(ctLegend.getSpPr()));
+				legend.setTxPr(getTextProperties(ctLegend.getTxPr()));
+			} else {
+				legend.setSpPr(getShapeProperties(ctLegend.getSpPr()));
+				legend.setTxPr(getTextProperties(ctLegend.getTxPr()));
+			}
+			List<LegendEntry> legendEntryList = new ArrayList<LegendEntry>();
+			Map<Long, LegendEntry> idEntryMap = new HashMap<Long, LegendEntry>();
+			for (CTLegendEntry ctEntry : ctLegend.getLegendEntryList()) {
+				LegendEntry entry = new LegendEntry();
+				entry.setIdx(ctEntry.getIdx().getVal());
+				entry.setTxPr(getTextProperties(ctEntry.getTxPr()));
+				legendEntryList.add(entry);
+				idEntryMap.put(ctEntry.getIdx().getVal(), entry);
+			}
+			legend.setEntryList(legendEntryList);
+			legend.setIdEntryMap(idEntryMap);
 		}
+
 		columnChart.setLegend(legend);
 
 		return columnChart;
