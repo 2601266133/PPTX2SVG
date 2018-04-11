@@ -36,15 +36,21 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.cisco.pptx_to_jpg_converter.model.PPTInformation;
+import com.cisco.pptx_to_jpg_converter.model.RequestResult;
 import com.cisco.pptx_to_jpg_converter.service.CiscoService;
 import com.cisco.pptx_to_jpg_converter.util.AbstractConverter;
+import com.cisco.pptx_to_jpg_converter.util.PPT2SVGByLibreOffice;
 import com.cisco.pptx_to_jpg_converter.util.PPTToSVGConverter;
+import com.cisco.pptx_to_jpg_converter.util.PPTX2SVGByLibreOffice;
 import com.cisco.pptx_to_jpg_converter.util.PPTXToSVGConverter;
 
 @RestController
 public class PPTFileUploadController {
 
 	private static final Logger logger = LoggerFactory.getLogger(PPTFileUploadController.class);
+
+	@Value("${converter.util}")
+	private String converterUtil;
 
 	@Value("${web.upload-path}")
 	private String filePath;
@@ -81,18 +87,16 @@ public class PPTFileUploadController {
 
 	@RequestMapping(value = "/upload", produces = { "application/json;charset=UTF-8", "application/xml;charset=UTF-8" })
 	@ResponseBody
-	public PPTInformation multipartFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
+	public RequestResult multipartFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
 		long startTime = System.currentTimeMillis();
 		logger.info("Start file upload processing ");
 		if (!file.isEmpty()) {
-
 			String fileName = null;
 			String name = null;
 			String suffixName = null;
 			Map<String, Object> map = new HashMap<String, Object>();
 			AbstractConverter converter = null;
 			PPTInformation pptInfo = null;
-			File tempPPTFile = null;
 			try {
 				// 获取文件名
 				fileName = file.getOriginalFilename();
@@ -109,25 +113,32 @@ public class PPTFileUploadController {
 				String newName = System.currentTimeMillis() + name;
 				File dest = new File(filePath + newName);
 
-				// 1.by LibreOffice
-				// if (".pptx".equals(suffixName) || ".potx".equals(suffixName) ||
-				// ".ppsx".equals(suffixName)) {
-				// converter = new PPTX2SVGByLibreOffice(file.getInputStream(), pptxImagePath,
-				// "svg");
-				// ((PPTX2SVGByLibreOffice)
-				// converter).setAnotherINStream(file.getInputStream());
-				// } else if (".ppt".equals(suffixName) || ".pps".equals(suffixName)) {
-				// converter = new PPT2SVGByLibreOffice(file.getInputStream(), pptxImagePath,
-				// "svg");
-				// ((PPT2SVGByLibreOffice) converter).setAnotherINStream(file.getInputStream());
-				// }
+				// if pptx file suffixName with ".potx", ".ppsx" also can be converted
+				// if ppt file suffixName with ".pps" also can be converted
 
-				// 2. by self and POI
-				if (".pptx".equals(suffixName) || ".potx".equals(suffixName) || ".ppsx".equals(suffixName)) {
-					converter = new PPTXToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
-				} else if (".ppt".equals(suffixName) || ".pps".equals(suffixName)) {
-					converter = new PPTToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
+				// 1.by LibreOffice
+				if ("3306".equals(converterUtil)) {
+					if (".pptx".equals(suffixName)) {
+						converter = new PPTX2SVGByLibreOffice(file.getInputStream(), pptxImagePath, "svg");
+						((PPTX2SVGByLibreOffice) converter).setAnotherINStream(file.getInputStream());
+					} else if (".ppt".equals(suffixName)) {
+						converter = new PPT2SVGByLibreOffice(file.getInputStream(), pptxImagePath, "svg");
+						((PPT2SVGByLibreOffice) converter).setAnotherINStream(file.getInputStream());
+					}
 				}
+
+				// 2. by POI
+				if ("3307".equals(converterUtil)) {
+					if (".pptx".equals(suffixName)) {
+						converter = new PPTXToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
+					} else if (".ppt".equals(suffixName)) {
+						converter = new PPTToSVGConverter(file.getInputStream(), pptxImagePath, "svg");
+					} else {
+						return new RequestResult(RequestResult.FAILED, "Please upload a file with.ppt or .pptx",
+								RequestResult.CODE_ERROR);
+					}
+				}
+
 				if (converter != null) {
 					converter.convert();
 					map = converter.getResultsMap();
@@ -143,7 +154,6 @@ public class PPTFileUploadController {
 					Map<String, Object> paramMap = new HashMap<String, Object>();
 					paramMap.put("pptInfo", pptInfo);
 					paramMap.put("imagesInfoList", map.get("imagesInfo"));
-					// service.addPPTByMapper(pptInfo);
 					service.addPPTByMapByMapper(paramMap);
 					logger.info("The PPT ID is: " + pptInfo.getId());
 
@@ -156,7 +166,6 @@ public class PPTFileUploadController {
 				}
 
 				if (dest.isFile() && dest.exists()) {
-					// return "文件已经存在，请更改文件名。";
 					dest.delete();
 				}
 				dest.setLastModified(System.currentTimeMillis());
@@ -174,35 +183,28 @@ public class PPTFileUploadController {
 			} catch (SQLException se) {
 				se.printStackTrace();
 				logger.error(se.getMessage());
-				// return "上传失败," + e.getMessage();
-				return pptInfo;
+				return new RequestResult(RequestResult.FAILED, se.getMessage(), RequestResult.CODE_ERROR);
 			} catch (IOException e) {
 				e.printStackTrace();
 				logger.error(e.getMessage());
 				PPTInfoController controller = new PPTInfoController();
 				controller.deletePPTAndImages(pptInfo);
 				service.deletePPTByIdByMapper(pptInfo.getId());
-				return pptInfo;
+				return new RequestResult(RequestResult.FAILED, e.getMessage(), RequestResult.CODE_ERROR);
 			} catch (Exception ee) {
 				ee.printStackTrace();
 				logger.error(ee.getMessage());
-				return pptInfo;
+				return new RequestResult(RequestResult.FAILED, ee.getMessage(), RequestResult.CODE_ERROR);
 			}
 
-			// return "/images";
-			// return "上传成功 ： 在目录 " + filePath + ": PPT 转换的结果是: " +
-			// map.get("converReturnResult");
 			ModelAndView mv = new ModelAndView("/images");
 			mv.addObject("map", map);
 			mv.addObject("PPTid", pptInfo.getId());
 			logger.info("Finish upload processing, take time: " + (System.currentTimeMillis() - startTime));
-			return pptInfo;
+			return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS, pptInfo);
 
 		} else {
-
-			// return "上传失败，因为文件是空的.";
-			return null;
-
+			return new RequestResult(RequestResult.FAILED, "File is empty.", RequestResult.CODE_NOT_FOUND);
 		}
 	}
 

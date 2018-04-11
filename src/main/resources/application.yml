@@ -6,4 +6,11 @@ pptx:
    
 temp:
     convert-ppt-path: ../temp/converter/upload/tempChange/ppt/  
+    
+ 
+#to use libreoffice, set converter.util: 3306
+#to use POI, set converter.util: 3307
+    
+converter:
+    util: 3306    
    

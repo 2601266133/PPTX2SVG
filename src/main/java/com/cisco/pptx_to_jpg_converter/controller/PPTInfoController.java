@@ -26,62 +26,66 @@ public class PPTInfoController {
 
 	@RequestMapping(value = "/ppt/{id}", produces = { "application/json;charset=UTF-8",
 			"application/xml;charset=UTF-8" }, method = RequestMethod.GET)
-	public PPTInformation getPPTById(@PathVariable String id) {
+	public RequestResult getPPTById(@PathVariable String id) {
 		// String id = request.getParameter("id");
-		return service.getPPTByIdByMapper(id);
+		return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS,
+				service.getPPTByIdByMapper(id));
 	}
 
 	@RequestMapping(value = "/ppt/name/{fileName}", produces = { "application/json;charset=UTF-8",
 			"application/xml;charset=UTF-8" }, method = RequestMethod.GET)
-	public PPTInformation getPPTByName(@PathVariable String fileName) {
-		return service.getPPTByNameByMapper(fileName);
+	public RequestResult getPPTByName(@PathVariable String fileName) {
+		return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS,
+				service.getPPTByNameByMapper(fileName));
 	}
 
 	@RequestMapping(value = "/ppts", produces = { "application/json;charset=UTF-8",
 			"application/xml;charset=UTF-8" }, method = RequestMethod.GET)
-	public List<PPTInformation> getPPTs() {
-		return service.getPPTsByMapper();
+	public RequestResult getPPTs() {
+		return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS,
+				service.getPPTsByMapper());
 	}
 
 	@RequestMapping(value = "/delete/ppt/{id}", produces = { "application/json;charset=UTF-8",
-			"application/xml;charset=UTF-8" }, method = RequestMethod.GET)
+			"application/xml;charset=UTF-8" }, method = { RequestMethod.GET, RequestMethod.DELETE })
 	public RequestResult deletePPTByid(@PathVariable String id) {
 
 		try {
 			PPTInformation result = service.getPPTByIdByMapper(id);
 			if (result == null) {
-				return new RequestResult("Result", "文件不存在。", "400");
+				return new RequestResult(RequestResult.FAILED, "File not found.", RequestResult.CODE_NOT_FOUND);
 			}
 			deletePPTAndImages(result);
 			service.deletePPTByIdByMapper(id);
 		} catch (SQLException se) {
-			return new RequestResult("Failed", "失败： " + se.getMessage(), "500");
+			return new RequestResult(RequestResult.FAILED, "Failed: " + se.getMessage(), RequestResult.CODE_ERROR);
 		}
-		return new RequestResult("Result", "成功。", "204");
+		return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS);
 	}
 
 	@RequestMapping(value = "/delete/ppts", produces = { "application/json;charset=UTF-8",
-			"application/xml;charset=UTF-8" }, method = RequestMethod.GET)
+			"application/xml;charset=UTF-8" }, method = { RequestMethod.GET, RequestMethod.DELETE })
 	public RequestResult deleteAllFiles() {
 		try {
 			List<PPTInformation> results = service.getPPTsByMapper();
 			if (results == null || results.isEmpty()) {
-				return new RequestResult("Failed", "文件不存在。", "400");
+				return new RequestResult(RequestResult.FAILED, "File not found.", RequestResult.CODE_NOT_FOUND);
 			}
 			for (PPTInformation result : results) {
 				deletePPTAndImages(result);
 			}
 			service.deletePPTsByMapper();
 		} catch (SQLException se) {
-			return new RequestResult("Failed", "失败： " + se.getMessage(), "500");
+			return new RequestResult(RequestResult.FAILED, "Failed: " + se.getMessage(), RequestResult.CODE_ERROR);
 		}
-		return new RequestResult("Success", "成功。", "204");
+		return new RequestResult(RequestResult.SUCCESS, "SUCCESS", RequestResult.CODE_SUCCESS);
 	}
 
 	public void deletePPTAndImages(PPTInformation result) {
 		String filePath = result.getFilePath();
 		String fileNewName = result.getFileNewName();
 		String imagePath = result.getImagePath();
+		logger.info("FilePath: " + filePath + " FileNewName: " + fileNewName + " ImagePath: " + imagePath);
 
 		File pptFile = new File(filePath + fileNewName);
 		if (pptFile.exists()) {

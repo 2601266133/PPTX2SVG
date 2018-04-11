@@ -167,6 +167,7 @@ public class PPTXToJPGConverter extends AbstractConverter {
 		catch (IOException e) {
 			e.printStackTrace();
 			converReturnResult = false;
+			throw new Exception(e);
 		} finally {
 			try {
 				if (inStream != null) {
@@ -174,6 +175,7 @@ public class PPTXToJPGConverter extends AbstractConverter {
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
+				throw new Exception(e1);
 			}
 			resultsMap.put("converReturnResult", converReturnResult);
 			resultsMap.put("imgNames", imgNamesList);

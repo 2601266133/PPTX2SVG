@@ -69,6 +69,7 @@ public class ChartUtils {
 	private static final Logger logger = LoggerFactory.getLogger(ChartUtils.class);
 
 	public static void setChart(XSLFChart chart, SVGGraphics2D graphics, XSLFSlide slide) {
+		logger.info("Start set charts.");
 		setBarChart(chart, graphics, slide);
 		set3DBarChart(chart, graphics, slide);
 		setPieChart(chart, graphics, slide);
@@ -76,6 +77,7 @@ public class ChartUtils {
 		setLineChart(chart, graphics, slide);
 		set3DLineChart(chart, graphics, slide);
 		setAreaChart(chart, graphics, slide);
+		logger.info("End set charts.");
 	}
 
 	public static void setBarChart(XSLFChart chart, SVGGraphics2D graphics, XSLFSlide slide) {
@@ -86,19 +88,6 @@ public class ChartUtils {
 			}
 		}
 
-		// for test
-		// List<CTGradientStop> gsLst =
-		// chart.getCTChart().getPlotArea().getSpPr().getGradFill().getGsLst().getGsList();
-		// for (CTGradientStop gs : gsLst) {
-		// logger.info(String.valueOf(gs.getPos()));
-		// }
-		//
-		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getX().toString());
-		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getY().toString());
-		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getW().toString());
-		// logger.info(chart.getCTChart().getPlotArea().getLayout().getManualLayout().getH().toString());
-
-		// -test
 		String barType = "";
 		List<CTBarChart> barList = chart.getCTChart().getPlotArea().getBarChartList();
 		if (barList.size() > 0) {
@@ -665,7 +654,9 @@ public class ChartUtils {
 				);
 				jChart.setBackgroundPaint(slide.getBackground().getFillColor());
 				jChart.setBorderVisible(false);
-				jChart.getLegend().setFrame(BlockBorder.NONE);
+				if (jChart.getLegend() != null) {
+					jChart.getLegend().setFrame(BlockBorder.NONE);
+				}
 
 				CategoryPlot plot = (CategoryPlot) jChart.getPlot();
 				plot.setBackgroundPaint(slide.getBackground().getFillColor());

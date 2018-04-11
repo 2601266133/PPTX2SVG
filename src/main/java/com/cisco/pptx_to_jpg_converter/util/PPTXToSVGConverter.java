@@ -131,12 +131,13 @@ public class PPTXToSVGConverter extends AbstractConverter {
 		catch (IOException e) {
 			e.printStackTrace();
 			converReturnResult = false;
-			dest.getParentFile().delete();
 			throw new Exception(e);
 		} catch (Exception e) {
 			e.printStackTrace();
 			converReturnResult = false;
-			dest.getParentFile().delete();
+			if (dest.getParentFile().exists()) {
+				dest.getParentFile().delete();
+			}
 			throw new Exception(e);
 		} finally {
 

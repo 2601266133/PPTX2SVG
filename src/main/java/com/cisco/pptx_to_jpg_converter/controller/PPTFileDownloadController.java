@@ -1,6 +1,5 @@
 package com.cisco.pptx_to_jpg_converter.controller;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class PPTFileDownloadController {
 		if (file.exists()) {
 			downloadFile(file, filename, response);
 		} else {
-			return "文件不存在。";
+			return "File not found";
 		}
 		return null;
 	}
@@ -63,7 +62,7 @@ public class PPTFileDownloadController {
 		if (file.exists()) {
 			downloadFile(file, fileOriginName, response);
 		} else {
-			return "文件不存在。";
+			return "File not found.";
 		}
 		logger.info("Finish download ppt, takes: " + (System.currentTimeMillis() - startTime));
 		logger.info("----------------------------------------------------------------------");
@@ -79,7 +78,7 @@ public class PPTFileDownloadController {
 		if (file.exists()) {
 			downloadFile(file, imageName, response);
 		} else {
-			return "文件不存在。";
+			return "File not found.";
 		}
 		return null;
 	}
@@ -103,7 +102,7 @@ public class PPTFileDownloadController {
 			if (imageFiles.length > 0) {
 				response.setContentType("APPLICATION/OCTET-STREAM");
 				response.setHeader("Content-Disposition",
-						"attachment;fileName=" + fileNewName.substring(0, fileNewName.lastIndexOf(".") - 1) + ".zip");
+						"attachment;fileName=" + fileNewName.substring(0, fileNewName.lastIndexOf(".")) + ".zip");
 
 				byte[] buffer = new byte[1024];
 				FileInputStream fis = null;
@@ -165,9 +164,7 @@ public class PPTFileDownloadController {
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition", "attachment;fileName=" + fileName);
 
-		// byte[] buffer = new byte[1024];
 		FileInputStream fis = null;
-		BufferedInputStream bis = null;
 
 		OutputStream os = null;
 
@@ -175,12 +172,6 @@ public class PPTFileDownloadController {
 			os = response.getOutputStream();
 			fis = new FileInputStream(file);
 			FileCopyUtils.copy(fis, os);
-			// bis = new BufferedInputStream(fis);
-			// int i = bis.read(buffer);
-			// while (i != -1) {
-			// os.write(buffer);
-			// i = bis.read(buffer);
-			// }
 
 		} catch (Exception e) {
 			e.printStackTrace();

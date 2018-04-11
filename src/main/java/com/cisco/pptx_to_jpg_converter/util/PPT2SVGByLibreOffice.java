@@ -43,7 +43,7 @@ public class PPT2SVGByLibreOffice extends AbstractConverter {
 	}
 
 	@Override
-	public void convert() {
+	public void convert() throws Exception {
 		converReturnResult = true;// 是否全部转成功
 		List<String> imgNamesList = new ArrayList<String>();// PPT转成图片后所有名称集合
 		List<File> imagesFileList = new ArrayList<File>();// 所有图片的file
@@ -123,9 +123,13 @@ public class PPT2SVGByLibreOffice extends AbstractConverter {
 				// ImageIO.write(oneBufferedImage, imageFormatNameString, dest);
 
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			converReturnResult = false;
+			if (dest != null && dest.getParentFile().exists()) {
+				dest.getParentFile().delete();
+			}
+			throw new Exception(e);
 		} finally {
 			try {
 				if (inStream != null) {
@@ -133,6 +137,7 @@ public class PPT2SVGByLibreOffice extends AbstractConverter {
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
+				throw new Exception(e1);
 			}
 			resultsMap.put("converReturnResult", converReturnResult);
 			resultsMap.put("imgNames", imgNamesList);

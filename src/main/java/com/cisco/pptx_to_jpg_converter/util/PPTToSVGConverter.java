@@ -33,7 +33,7 @@ public class PPTToSVGConverter extends AbstractConverter {
 	}
 
 	@Override
-	public void convert() {
+	public void convert() throws Exception {
 		converReturnResult = true;// 是否全部转成功
 		List<String> imgNamesList = new ArrayList<String>();// PPT转成图片后所有名称集合
 		List<File> imagesFileList = new ArrayList<File>();// 所有图片的file
@@ -91,9 +91,10 @@ public class PPTToSVGConverter extends AbstractConverter {
 				// ImageIO.write(oneBufferedImage, imageFormatNameString, dest);
 
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			converReturnResult = false;
+			throw new Exception(e.getMessage());
 		} finally {
 			try {
 				if (inStream != null) {
@@ -101,6 +102,7 @@ public class PPTToSVGConverter extends AbstractConverter {
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
+				throw new Exception(e1.getMessage());
 			}
 			resultsMap.put("converReturnResult", converReturnResult);
 			resultsMap.put("imgNames", imgNamesList);

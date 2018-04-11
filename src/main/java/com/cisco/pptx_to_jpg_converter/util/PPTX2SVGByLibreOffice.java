@@ -129,12 +129,16 @@ public class PPTX2SVGByLibreOffice extends AbstractConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 			converReturnResult = false;
-			dest.getParentFile().delete();
+			if (dest != null && dest.getParentFile().exists()) {
+				dest.getParentFile().delete();
+			}
 			throw new Exception(e);
 		} catch (Exception e) {
 			e.printStackTrace();
 			converReturnResult = false;
-			dest.getParentFile().delete();
+			if (dest != null && dest.getParentFile().exists()) {
+				dest.getParentFile().delete();
+			}
 			throw new Exception(e);
 		} finally {
 

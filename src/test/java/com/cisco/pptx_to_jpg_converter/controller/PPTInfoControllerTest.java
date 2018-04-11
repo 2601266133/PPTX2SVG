@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,19 +37,22 @@ public class PPTInfoControllerTest {
 
 	@Test
 	public void testGetPPTById() throws Exception {
+		RequestResult result = new RequestResult();
 		PPTInformation pptInfo = new PPTInformation();
 		pptInfo.setId("1");
 		pptInfo.setFileOrignName("Test.pptx");
 		pptInfo.setFileNewName("12345667Test.pptx");
 		pptInfo.setFilePath("D:\\ppt");
 		pptInfo.setImagePath("D:\\image\\1");
+		result.setPptInfo(pptInfo);
 		Mockito.when(this.service.getPPTByIdByMapper(Mockito.anyString())).thenReturn(pptInfo);
-		ResponseEntity<PPTInformation> entity = restTemplate.getForEntity("/ppt/1.xml", PPTInformation.class);
-		assertEquals(entity.getBody().getId(), pptInfo.getId());
+		ResponseEntity<RequestResult> entity = restTemplate.getForEntity("/ppt/1.xml", RequestResult.class);
+		assertEquals(entity.getBody().getPptInfo().getId(), pptInfo.getId());
 	}
 
 	@Test
 	public void testGetPPTs() throws Exception {
+		RequestResult result = new RequestResult();
 		List<PPTInformation> pptInfoList = new ArrayList<PPTInformation>();
 		PPTInformation pptInfo = new PPTInformation();
 		pptInfo.setId("1");
@@ -66,10 +68,13 @@ public class PPTInfoControllerTest {
 		pptInfo2.setImagePath("D:\\image\\2");
 		pptInfoList.add(pptInfo);
 		pptInfoList.add(pptInfo2);
+		result.setPptInfos(pptInfoList);
+		result.setCode("200");
+		result.setResult("Success");
 		Mockito.when(this.service.getPPTsByMapper()).thenReturn(pptInfoList);
-		ResponseEntity<List> entity = restTemplate.getForEntity("/ppts.xml", List.class);
-		assertEquals(((Map) entity.getBody().get(0)).get("id"), pptInfo.getId());
-		assertEquals(((Map) entity.getBody().get(1)).get("id"), pptInfo2.getId());
+		ResponseEntity<RequestResult> entity = restTemplate.getForEntity("/ppts.xml", RequestResult.class);
+		assertEquals(entity.getBody().getPptInfos().get(0).getId(), pptInfo.getId());
+		assertEquals(entity.getBody().getPptInfos().get(1).getId(), pptInfo2.getId());
 	}
 
 	@Test
@@ -84,8 +89,8 @@ public class PPTInfoControllerTest {
 		Mockito.doNothing().when(service).deletePPTByIdByMapper(Mockito.anyString());
 		ResponseEntity<RequestResult> entity = restTemplate.getForEntity("/delete/ppt/1", RequestResult.class);
 		// 当有多个构造方法时，必须要写出默认的构造方法
-		assertEquals(entity.getBody().getCode(), "204");
-		assertEquals(entity.getBody().getContext(), "成功。");
+		assertEquals(entity.getBody().getCode(), "200");
+		assertEquals(entity.getBody().getContext(), "SUCCESS");
 	}
 
 	@Test
@@ -108,8 +113,8 @@ public class PPTInfoControllerTest {
 		Mockito.when(service.getPPTsByMapper()).thenReturn(pptInfoList);
 		Mockito.doNothing().when(service).deletePPTsByMapper();
 		ResponseEntity<RequestResult> entity = restTemplate.getForEntity("/delete/ppts", RequestResult.class);
-		assertEquals(entity.getBody().getCode(), "204");
-		assertEquals(entity.getBody().getContext(), "成功。");
+		assertEquals(entity.getBody().getCode(), "200");
+		assertEquals(entity.getBody().getContext(), "SUCCESS");
 	}
 
 }
